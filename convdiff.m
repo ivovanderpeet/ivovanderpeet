@@ -32,7 +32,7 @@ SMAXneeded = 1E-8;      % maximum accepted error in mass balance [kg/s]
 SAVGneeded = 1E-9;      % maximum accepted average error in mass balance [kg/s]
 LARGE      = 1E30;      % arbitrary very large value [-]
 P_ATM      = 101000.;   % atmospheric pressure [Pa]
-U_IN       = 0.2;      % in flow velocity [m/s]
+U_IN       = 0.02;      % in flow velocity [m/s]
 NPRINT     = 1;         % number of iterations between printing output to screen
 
 JBOT = 2:ceil((NPJ+1)/0.12*0.05);
