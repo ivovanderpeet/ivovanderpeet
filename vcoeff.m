@@ -41,6 +41,10 @@ for I = Istart:Iend
         % The source terms
         SP(I,j) = 0.;
         Su(I,j) = 0.;
+
+        if max(j == JMID)
+            SP(I,j) = -LARGE;
+        end
         
         % The coefficients (hybrid differencing scheme)
         aW(I,j) = max([ Fw, Dw + Fw/2, 0.]);
@@ -55,17 +59,17 @@ for I = Istart:Iend
 %         if (I == ceil((NPI+1)/5)   && j < ceil((NPJ+1)/3))     % right of baffle #1
 %             aW(I,j) = 0;
 %         end
-        % not sure if this is necessary
-        if j == max(JBOT) % Bottom of bottom side of wall
-            aN(I,j) = 0;
-        end
-        if max(j == JMID) % Top of bottom side of wall
-            aN(I,j) = 0;
-            aS(I,j) = 0;
-        end   
-        if j == min(JTOP) % Top of top side of wall
-            aS(I,j) = 0;
-        end
+        % not sure if this is necessary (no it's not)
+%         if j == max(JBOT) % Bottom of bottom side of wall
+%             aN(I,j) = 0;
+%         end
+%         if max(j == JMID) % Top of bottom side of wall
+%             aN(I,j) = 0;
+%             aS(I,j) = 0;
+%         end   
+%         if j == min(JTOP) % Top of top side of wall
+%             aS(I,j) = 0;
+%         end
         
         % eq. 8.31 without time dependent terms (see also eq. 5.14):
         aP(I,j) = aW(I,j) + aE(I,j) + aS(I,j) + aN(I,j) + Fe - Fw + Fn - Fs - SP(I,J);

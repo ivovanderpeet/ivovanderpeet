@@ -12,10 +12,10 @@ T(1,JTOP) = 573;
 
 % Setting the velocity at inlet
 u(2,JBOT) = U_IN;
-u(2,JTOP) = U_IN;
+u(2,JTOP) = 2*U_IN;
 
-u(:,JMID) = 0;
-v(:,JMID) = 0;
+% u(:,JMID) = 0;
+% v(:,JMID) = 0;
 
 % Zero temperature gradient at outer walls
 T(:, NPJ+2) = T(:, NPJ+1);

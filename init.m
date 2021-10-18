@@ -2,7 +2,7 @@ function [] = init()
 % Purpose: To initilise all parameters.
 
 % constants
-global NPI NPJ LARGE U_IN XMAX YMAX JMID
+global NPI NPJ LARGE U_IN XMAX YMAX JMID JBOT JTOP
 % variables
 global x x_u y y_v u v pc p T rho mu Gamma Cp b SP Su d_u d_v omega SMAX SAVG ...
     m_in m_out relax_u relax_v relax_pc relax_T relax_rho aP aE aW aN aS F_u F_v
@@ -89,24 +89,45 @@ SAVG = LARGE;
 m_in  = 1.;
 m_out = 1.;
 
+%% Properties water
 u(:,:)   = 0.;    % Velocity in x-direction
 v(:,:)   = 0.;    % Velocity in y-direction
 p(:,:)   = 0.;    % Relative pressure
 pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
 T(:,:)   = 273.;  % Temperature
+T(:,JMID) = 400;
 rho(:,:) = 1000.0;   % Density
 rho(:,JMID) = 9000;
-mu(:,:)  = 1.E-3; % Viscosity
+mu(:,:)  = 2.E-5; % Viscosity
 Cp(:,:)  = 4800.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
 Cp(:,JMID) = 385;
-% Gamma    = 0.0315./Cp; % Thermal conductivity
+Gamma    = 0.0315./Cp; % Thermal conductivity
 d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
 d_v(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
 b(:,:)   = 0.;	  % The general constant
 SP(:,:)  = 0.;    % Source term
 Su(:,:)  = 0.;	  % Source term
 
-u(NPI+1,2:NPJ+1) = 0.5*U_IN;
+%% Properties air
+% u(:,:)   = 0.;    % Velocity in x-direction
+% v(:,:)   = 0.;    % Velocity in y-direction
+% p(:,:)   = 0.;    % Relative pressure
+% pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
+% T(:,:)   = 273.;  % Temperature
+% rho(:,:) = 1.0;   % Density
+% mu(:,:)  = 2.E-5; % Viscosity
+% Cp(:,:)  = 1013.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
+% Cp(:,JMID) = 385;
+% Gamma    = 0.0315./Cp; % Thermal conductivity
+% d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
+% d_v(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
+% b(:,:)   = 0.;	  % The general constant
+% SP(:,:)  = 0.;    % Source term
+% Su(:,:)  = 0.;	  % Source term
+
+u(NPI+1,JBOT) = 0.5*U_IN;
+u(NPI+1,JTOP) = 2*0.5*U_IN;
+
 % Important to avoid crash!! Othervise m_out calculated in subroutine globcont
 % would be zero at first iteration=>m_in/m_out =INF
 

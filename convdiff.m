@@ -19,8 +19,8 @@ global NPI NPJ XMAX YMAX LARGE U_IN JBOT JMID JTOP
 global x x_u y y_v u v pc p T rho mu Gamma Cp aP aE aW aN aS b d_u d_v  SMAX SAVG relax_rho 
     
 % constants
-NPI        = 48;       % number of grid cells in x-direction [-]
-NPJ        = 24;        % number of grid cells in y-direction [-]
+NPI        = 96;       % number of grid cells in x-direction [-]
+NPJ        = 48;        % number of grid cells in y-direction [-]
 XMAX       = 0.24;      % width of the domain [m]
 YMAX       = 0.12;      % height of the domain [m]
 MAX_ITER   = 1000;      % maximum number of outer iterations [-]
@@ -77,11 +77,16 @@ while (iter <= MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded)
     % Note: rho at the walls are not needed in this case, and therefore not calculated.    
     for I = 1:NPI+2
         for J = 2:NPJ+1
-            if (I == 1) % Since p(1, J) doesn't exist, we set:
-                rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I+1,J) + P_ATM)/(287.*T(I,J));
+            if max(J == JMID)
+                rho(I,J) = 1; % kg/m3
             else
-                rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I,J) + P_ATM)/(287.*T(I,J));
+                rho(I,J) = 1000; % kg/m3
             end
+%             if (I == 1) % Since p(1, J) doesn't exist, we set:
+%                 rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I+1,J) + P_ATM)/(287.*T(I,J));
+%             else
+%                 rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I,J) + P_ATM)/(287.*T(I,J));
+%             end
         end
     end
     % end of density calculation======================================================================
@@ -97,10 +102,9 @@ while (iter <= MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded)
     for I = 1:NPI+2
         for J = 2:NPJ+1
             if max(J == JMID)
-                Gamma(I,J) = 386; % W/m/K
+                Gamma(I,J) = 380; % W/m/K
             else
-%                 Gamma(I,J) = (6.1E-5*T(I,J) + 8.4E-3)/Cp(I,J);
-                Gamma(I,J) = -8.354e-6*T(I,J)^2 + 6.53e-3*T(I,J) - 0.5981;
+                Gamma(I,J) = .65;
             end
             if (Gamma(I,J) < 0.)
                 output();
@@ -193,4 +197,8 @@ view(0,90)
 
 figure(5)
 surf(X,Y,Cp'); colorbar; title("Heat capacity")
+view(0,90)
+
+figure(6)
+surf(X,Y,rho'); colorbar; title("Density")
 view(0,90)
