@@ -13,16 +13,19 @@ close all
 clc
 %% declare all constants and variables
 % global contants
-global NPI NPJ XMAX YMAX LARGE U_IN JBOT JMID JTOP
+global NPI NPJ XMAX YMAX LARGE U_IN JBOT JMID JTOP Dy
 
 % variables
 global x x_u y y_v u v pc p T rho mu Gamma Cp aP aE aW aN aS b d_u d_v  SMAX SAVG relax_rho 
     
 % constants
 NPI        = 96;       % number of grid cells in x-direction [-]
-NPJ        = 96;        % number of grid cells in y-direction [-]
+NPJ        = 48;        % number of grid cells in y-direction [-]
 XMAX       = 0.24;      % width of the domain [m]
 YMAX       = 0.12;      % height of the domain [m]
+HBOT       = 0.05;
+HTOP       = 0.05;
+HMID       = YMAX - HBOT - HTOP;
 MAX_ITER   = 1000;      % maximum number of outer iterations [-]
 U_ITER     = 1;         % number of Newton iterations for u equation [-]
 V_ITER     = 1;         % number of Newton iterations for u equation [-]
@@ -174,9 +177,6 @@ plot(x, 0.07*ones(1,length(x)), 'k');
 plot(x, 0.05*ones(1,length(x)), 'k');
 plot(x, 0.12*ones(1,length(x)), 'k');
 
-
-
-
 figure(2)
 surf(X,Y,T'); colorbar; title("Temperature")
 view(0,90); hold on
@@ -200,17 +200,20 @@ view(0,90)
 % view(0,90)
 
 %% Check balance
-m_in_bot = mean(u(2,JBOT).*rho(2,JBOT))
-m_out_bot = mean(u(NPI+1,JBOT).*rho(NPI+1,JBOT))
+m_in_bot = u(2,JBOT).*rho(2,JBOT)*Dy;
+m_out_bot = u(NPI+1,JBOT).*rho(NPI+1,JBOT)*Dy;
 
-m_in_top = mean(u(2,JTOP).*rho(2,JTOP))
-m_out_top = mean(u(NPI+1,JTOP).*rho(NPI+1,JTOP))
+m_in_top = u(2,JTOP).*rho(2,JTOP)*Dy;
+m_out_top = u(NPI+1,JTOP).*rho(NPI+1,JTOP)*Dy;
 
-Q_in_bot = mean(m_in_top*Cp(2,JBOT).*T(2,JBOT));
-Q_out_bot = mean(m_in_top*Cp(NPI+1,JBOT).*T(NPI+1,JBOT));
+Q_in_bot = sum(m_in_bot.*Cp(2,JBOT).*T(2,JBOT));
+Q_out_bot = sum(m_out_bot.*Cp(NPI+1,JBOT).*T(NPI+1,JBOT));
 
-Q_in_top = mean(m_in_top*Cp(2,JTOP).*T(2,JTOP));
-Q_out_top = mean(m_in_top*Cp(NPI+1,JTOP).*T(NPI+1,JTOP));
+Q_in_top = sum(m_in_top.*Cp(2,JTOP).*T(2,JTOP));
+Q_out_top = sum(m_out_top.*Cp(NPI+1,JTOP).*T(NPI+1,JTOP));
 
 dQ_bot = Q_out_bot - Q_in_bot
 dQ_top = Q_out_top - Q_in_top
+
+Q_in = Q_in_top + Q_in_bot
+Q_out = Q_out_top + Q_out_bot

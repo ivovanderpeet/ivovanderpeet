@@ -2,7 +2,7 @@ function [] = init()
 % Purpose: To initilise all parameters.
 
 % constants
-global NPI NPJ LARGE U_IN XMAX YMAX JMID JBOT JTOP
+global NPI NPJ LARGE U_IN XMAX YMAX JMID JBOT JTOP Dy HBOT HMID HTOP
 % variables
 global x x_u y y_v u v pc p T rho mu Gamma Cp b SP Su d_u d_v omega SMAX SAVG ...
     m_in m_out relax_u relax_v relax_pc relax_T relax_rho aP aE aW aN aS F_u F_v
@@ -109,7 +109,16 @@ m_out = 1.;
 % Su(:,:)  = 0.;	  % Source term
 
 %% Properties air
-u(:,:)   = 0.;    % Velocity in x-direction
+% u(:,:)   = 0.;    % Velocity in x-direction
+for J = 1:NPJ+2
+    if max(J == JBOT)
+        u(:,J) = -U_IN*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
+    elseif max(J == JTOP)
+        u(:,J) = U_IN*(1.-(2.*((y(J) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
+    else
+        u(:,J) = 0;
+    end
+end
 v(:,:)   = 0.;    % Velocity in y-direction
 p(:,:)   = 0.;    % Relative pressure
 pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
@@ -126,8 +135,8 @@ b(:,:)   = 0.;	  % The general constant
 SP(:,:)  = 0.;    % Source term
 Su(:,:)  = 0.;	  % Source term
 
-u(NPI+1,JBOT) = 0.5*U_IN;
-u(NPI+1,JTOP) = 0.5*U_IN;
+% u(NPI+1,JBOT) = 0.5*U_IN;
+% u(NPI+1,JTOP) = 0.5*U_IN;
 
 % Important to avoid crash!! Othervise m_out calculated in subroutine globcont
 % would be zero at first iteration=>m_in/m_out =INF

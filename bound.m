@@ -2,17 +2,24 @@ function [] = bound()
 % Purpose: Specify boundary conditions for a calculation
 
 % constants
-global NPI NPJ U_IN JBOT JTOP JMID
+global NPI NPJ U_IN JBOT JTOP JMID HBOT HMID HTOP
 % variables
-global  u v T y_v F_u v m_in_TOP m_out_TOP m_in_BOT m_out_BOT
+global  u v T y_v F_u v m_in_TOP m_out_TOP m_in_BOT m_out_BOT y
 
 % Fixed temperature in Kelvin of the incoming fluid
-T(1,JBOT) = 273;
+T(NPI+2,JBOT) = 273;
 T(1,JTOP) = 573;
 
 % Setting the velocity at inlet
-u(2,JBOT) = U_IN;
-u(2,JTOP) = U_IN;
+% u(2,JBOT) = U_IN;
+% u(2,JTOP) = U_IN;
+for J = 1:NPJ+2
+    if max(J == JBOT)
+        u(2,J) = -U_IN*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
+    elseif max(J == JTOP)
+        u(2,J) = U_IN*(1.-(2.*((y(J) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
+    end
+end
 
 % u(:,JMID) = 0;
 % v(:,JMID) = 0;
@@ -51,9 +58,11 @@ u(NPI+2,JBOT) = u(NPI+1,JBOT)*m_in_BOT/m_out_BOT;
 v(NPI+2,JTOP) = v(NPI+1,JTOP);
 v(NPI+2,JBOT) = v(NPI+1,JBOT);
 
-T(NPI+2,JTOP) = T(NPI+1,JTOP);
+
 T(NPI+2,JMID) = T(NPI+1,JMID);  % Otherwise both ends of the wall will always have the initial temperature
-T(1,JMID)     = T(2,JMID);          % Otherwise both ends of the wall will always have the initial temperature
-T(NPI+2,JBOT) = T(NPI+1,JBOT);
+T(1,JMID)     = T(2,JMID);      % Otherwise both ends of the wall will always have the initial temperature
+
+T(1,JBOT) = T(2,JBOT);
+T(NPI+2,JTOP) = T(NPI+1,JTOP);
 end
 
