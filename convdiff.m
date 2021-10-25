@@ -20,20 +20,21 @@ global x x_u y y_v u v pc p T rho mu Gamma Cp aP aE aW aN aS b d_u d_v  SMAX SAV
     
 % constants
 NPI        = 96;       % number of grid cells in x-direction [-]
-NPJ        = 48;        % number of grid cells in y-direction [-]
+NPJ        = 96;        % number of grid cells in y-direction [-]
 XMAX       = 0.24;      % width of the domain [m]
 YMAX       = 0.12;      % height of the domain [m]
 MAX_ITER   = 1000;      % maximum number of outer iterations [-]
 U_ITER     = 1;         % number of Newton iterations for u equation [-]
 V_ITER     = 1;         % number of Newton iterations for u equation [-]
 PC_ITER    = 200;       % number of Newton iterations for pc equation [-]
-T_ITER     = 1;         % number of Newton iterations for T equation [-]
-SMAXneeded = 1E-8;      % maximum accepted error in mass balance [kg/s]
-SAVGneeded = 1E-9;      % maximum accepted average error in mass balance [kg/s]
+T_ITER     = 100;       % number of Newton iterations for T equation [-]
+SMAXneeded = 1E-9;      % maximum accepted error in mass balance [kg/s]
+SAVGneeded = 1E-10;     % maximum accepted average error in mass balance [kg/s]
 LARGE      = 1E30;      % arbitrary very large value [-]
 P_ATM      = 101000.;   % atmospheric pressure [Pa]
 U_IN       = 0.02;      % in flow velocity [m/s]
 NPRINT     = 1;         % number of iterations between printing output to screen
+
 
 JBOT = 2:ceil((NPJ+1)/0.12*0.05);
 JMID = ceil((NPJ+1)/0.12*0.05)+1:ceil((NPJ+1)/0.12*0.07);
@@ -77,16 +78,11 @@ while (iter <= MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded)
     % Note: rho at the walls are not needed in this case, and therefore not calculated.    
     for I = 1:NPI+2
         for J = 2:NPJ+1
-            if max(J == JMID)
-                rho(I,J) = 1; % kg/m3
+            if (I == 1) % Since p(1, J) doesn't exist, we set:
+                rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I+1,J) + P_ATM)/(287.*T(I,J));
             else
-                rho(I,J) = 1000; % kg/m3
+                rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I,J) + P_ATM)/(287.*T(I,J));
             end
-%             if (I == 1) % Since p(1, J) doesn't exist, we set:
-%                 rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I+1,J) + P_ATM)/(287.*T(I,J));
-%             else
-%                 rho(I,J) = (1 - relax_rho)*rho(I,J) + relax_rho*(p(I,J) + P_ATM)/(287.*T(I,J));
-%             end
         end
     end
     % end of density calculation======================================================================
@@ -101,11 +97,11 @@ while (iter <= MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded)
     % Purpose: Calculate the thermal conductivity in the fluid as a function of temperature.    
     for I = 1:NPI+2
         for J = 2:NPJ+1
-            if max(J == JMID)
-                Gamma(I,J) = 380; % W/m/K
-            else
-                Gamma(I,J) = .65;
-            end
+%             if max(J == JMID)
+%                 Gamma(I,J) = 380; % W/m/K
+%             else
+                Gamma(I,J) = (6.1E-5*T(I,J) + 8.4E-3)/Cp(I,J);
+%             end
             if (Gamma(I,J) < 0.)
                 output();
                 fprintf('Error: Gamma(%d,%d) = %e\n', I, J, Gamma(I,J));
@@ -194,11 +190,27 @@ view(0,90)
 figure(4)
 surf(X,Y,Gamma'); colorbar; title("Gamma")
 view(0,90)
+% 
+% figure(5)
+% surf(X,Y,Cp'); colorbar; title("Heat capacity")
+% view(0,90)
+% 
+% figure(6)
+% surf(X,Y,rho'); colorbar; title("Density")
+% view(0,90)
 
-figure(5)
-surf(X,Y,Cp'); colorbar; title("Heat capacity")
-view(0,90)
+%% Check balance
+m_in_bot = mean(u(2,JBOT).*rho(2,JBOT))
+m_out_bot = mean(u(NPI+1,JBOT).*rho(NPI+1,JBOT))
 
-figure(6)
-surf(X,Y,rho'); colorbar; title("Density")
-view(0,90)
+m_in_top = mean(u(2,JTOP).*rho(2,JTOP))
+m_out_top = mean(u(NPI+1,JTOP).*rho(NPI+1,JTOP))
+
+Q_in_bot = mean(m_in_top*Cp(2,JBOT).*T(2,JBOT));
+Q_out_bot = mean(m_in_top*Cp(NPI+1,JBOT).*T(NPI+1,JBOT));
+
+Q_in_top = mean(m_in_top*Cp(2,JTOP).*T(2,JTOP));
+Q_out_top = mean(m_in_top*Cp(NPI+1,JTOP).*T(NPI+1,JTOP));
+
+dQ_bot = Q_out_bot - Q_in_bot
+dQ_top = Q_out_top - Q_in_top

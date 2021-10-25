@@ -2,7 +2,7 @@ function [] = Tcoeff()
 % Purpose: To calculate the coefficients for the T equation.
 
 % constants
-global NPI NPJ 
+global NPI NPJ JMID
 % variables
 global x x_u y y_v T Gamma SP Su F_u F_v relax_T Istart Iend Jstart Jend ...
     b aE aW aN aS aP
@@ -52,6 +52,19 @@ for I = Istart:Iend
         aE(I,j) = max([-Fe, De - Fe/2, 0.]);
         aS(I,j) = max([ Fs, Ds + Fs/2, 0.]);
         aN(I,j) = max([-Fn, Dn - Fn/2, 0.]);
+
+        % TROUBLESHOOTING
+%         if max(J == JMID)
+%             if aW(I,j) == Fw
+%                 fprintf('Fw');
+%             elseif aW(I,j) == Dw + Fw/2
+%                 fprintf('Dw + Fw/2, Fw = %10.2e', Fw);
+%             elseif aW(I,j) == 0
+%                 fprintf('0');
+%             else
+%                 fprintf('Unsure');
+%             end
+%         end
                 
         % eq. 8.31 without time dependent terms (see also eq. 5.14):
         aP(I,J) = aW(I,J) + aE(I,J) + aS(I,J) + aN(I,J) + Fe - Fw + Fn - Fs - SP(I,J);

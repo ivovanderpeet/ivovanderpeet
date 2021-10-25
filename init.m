@@ -90,33 +90,16 @@ m_in  = 1.;
 m_out = 1.;
 
 %% Properties water
-u(:,:)   = 0.;    % Velocity in x-direction
-v(:,:)   = 0.;    % Velocity in y-direction
-p(:,:)   = 0.;    % Relative pressure
-pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
-T(:,:)   = 273.;  % Temperature
-T(:,JMID) = 400;
-rho(:,:) = 1000.0;   % Density
-rho(:,JMID) = 9000;
-mu(:,:)  = 2.E-5; % Viscosity
-Cp(:,:)  = 4800.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
-Cp(:,JMID) = 385;
-Gamma    = 0.0315./Cp; % Thermal conductivity
-d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
-d_v(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
-b(:,:)   = 0.;	  % The general constant
-SP(:,:)  = 0.;    % Source term
-Su(:,:)  = 0.;	  % Source term
-
-%% Properties air
 % u(:,:)   = 0.;    % Velocity in x-direction
 % v(:,:)   = 0.;    % Velocity in y-direction
 % p(:,:)   = 0.;    % Relative pressure
 % pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
 % T(:,:)   = 273.;  % Temperature
-% rho(:,:) = 1.0;   % Density
-% mu(:,:)  = 2.E-5; % Viscosity
-% Cp(:,:)  = 1013.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
+% % T(:,JMID) = 400;
+% rho(:,:) = 1000.0;   % Density
+% rho(:,JMID) = 9000;
+% mu(:,:)  = 1.E-3; % Viscosity
+% Cp(:,:)  = 4800.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
 % Cp(:,JMID) = 385;
 % Gamma    = 0.0315./Cp; % Thermal conductivity
 % d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
@@ -125,8 +108,26 @@ Su(:,:)  = 0.;	  % Source term
 % SP(:,:)  = 0.;    % Source term
 % Su(:,:)  = 0.;	  % Source term
 
+%% Properties air
+u(:,:)   = 0.;    % Velocity in x-direction
+v(:,:)   = 0.;    % Velocity in y-direction
+p(:,:)   = 0.;    % Relative pressure
+pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
+T(:,:)   = 273.;  % Temperature
+T(:,JTOP) = 573.;
+rho(:,:) = 1.0;   % Density
+mu(:,:)  = 2.E-5; % Viscosity
+Cp(:,:)  = 1013.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
+Cp(:,JMID) = 385;
+Gamma    = 0.0315./Cp; % Thermal conductivity
+d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
+d_v(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
+b(:,:)   = 0.;	  % The general constant
+SP(:,:)  = 0.;    % Source term
+Su(:,:)  = 0.;	  % Source term
+
 u(NPI+1,JBOT) = 0.5*U_IN;
-u(NPI+1,JTOP) = 2*0.5*U_IN;
+u(NPI+1,JTOP) = 0.5*U_IN;
 
 % Important to avoid crash!! Othervise m_out calculated in subroutine globcont
 % would be zero at first iteration=>m_in/m_out =INF

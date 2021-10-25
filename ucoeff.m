@@ -26,18 +26,31 @@ for I = Istart:Iend
         
         % eq. 6.9a-6.9d - the convective mass flux defined in eq. 5.8a
         % note:  F = rho*u but Fw = (rho*u)w = rho*u*AREAw per definition.
-        Fw = ((F_u(i,J)   + F_u(i-1,J))/2)*AREAw;
-        Fe = ((F_u(i+1,J) + F_u(i,J))/2)*AREAe;
-        Fs = ((F_v(I,j)   + F_v(I-1,j))/2)*AREAs;
-        Fn = ((F_v(I,j+1) + F_v(I-1,j+1))/2)*AREAn;
+        if ~max(J == JMID)
+            Fw = ((F_u(i,J)   + F_u(i-1,J))/2)*AREAw;
+            Fe = ((F_u(i+1,J) + F_u(i,J))/2)*AREAe;
+            Fs = ((F_v(I,j)   + F_v(I-1,j))/2)*AREAs;
+            Fn = ((F_v(I,j+1) + F_v(I-1,j+1))/2)*AREAn;
+        else
+            Fw = 0;
+            Fe = 0;
+            Fs = 0;
+            Fn = 0;
+        end
         
         % eq. 6.9e-6.9h - the transport by diffusion defined in eq. 5.8b
         % note: D = mu/Dx but Dw = (mu/Dx)*AREAw per definition
-        Dw = (mu(I-1,J)/(x_u(i) - x_u(i-1)))*AREAw;
-        De = (mu(I,J)/(x_u(i+1) - x_u(i)))*AREAe;
-        Ds = ((mu(I-1,J) + mu(I,J) + mu(I-1,J-1) + mu(I,J-1))/(4*(y(J) - y(J-1))))*AREAs;
-        Dn = ((mu(I-1,J+1) + mu(I,J+1) + mu(I-1,J) + mu(I,J))/(4*(y(J+1) - y(J))))*AREAn;
-        
+        if ~max(J == JMID)
+            Dw = (mu(I-1,J)/(x_u(i) - x_u(i-1)))*AREAw;
+            De = (mu(I,J)/(x_u(i+1) - x_u(i)))*AREAe;
+            Ds = ((mu(I-1,J) + mu(I,J) + mu(I-1,J-1) + mu(I,J-1))/(4*(y(J) - y(J-1))))*AREAs;
+            Dn = ((mu(I-1,J+1) + mu(I,J+1) + mu(I-1,J) + mu(I,J))/(4*(y(J+1) - y(J))))*AREAn;
+        else
+            Dw = 0;
+            De = 0;
+            Ds = 0;
+            Dn = 0;
+        end
         % The source terms
         SP(i,J) = 0.;
         Su(i,J) = 0.;
