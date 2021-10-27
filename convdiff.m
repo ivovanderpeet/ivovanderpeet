@@ -38,6 +38,17 @@ JTOP = ceil((NPJ+1)/0.12*0.07)+1:NPJ+1;
 %% main calculations
 init();  %call initialization function
 
+% This is part of the init function
+for JJ = 1:NPJ+2
+    if max(JJ == JBOT)
+        u(:,JJ) = COFLOW*U_IN*(1.-(2.*(y(JJ)-HBOT/2.)/HBOT)^2); % inlet bot
+    elseif max(JJ == JTOP)
+        u(:,JJ) = U_IN*(1.-(2.*((y(JJ) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
+    else
+        u(:,JJ) = zeros(size(u(:,JJ)));
+    end
+end
+
 iter = 1;
 % outer iteration loop
 while (iter <= MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded)
@@ -55,6 +66,15 @@ while (iter <= MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded)
     end
     
     bound(); %apply boundary conditions 
+    % Setting the velocity at inlet
+    % This is part of the bound script
+    for J = 1:NPJ+2
+        if max(J == JBOT)
+            u(2,J) = COFLOW*U_IN*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
+        elseif max(J == JTOP)
+            u(2,J) = U_IN*(1.-(2.*((y(J) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
+        end
+    end
     
     pccoeff(); %call pccoeffe.m function to calculate the coefficients for p function
     for iter_pc = 1:PC_ITER

@@ -70,7 +70,7 @@ for i = 3:NPI+2
     x_u(i) = x_u(i-1) + Dx;
 end
 
-% Length variable for the velocity components v(I,j) in the y direction 
+% Length variable for the velocity components v(I,j) in the y direction
 y_v(1) = 0.;
 y_v(2) = 0.;
 for j = 3:NPJ+2
@@ -86,17 +86,8 @@ omega = 1.0; % Over-relaxation factor for SOR solver
 SMAX = LARGE;
 SAVG = LARGE;
 
-%% Properties air
-% u(:,:)   = 0.;    % Velocity in x-direction
-for J = 1:NPJ+2
-    if max(J == JBOT)
-        u(:,J) = COFLOW*U_IN*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
-    elseif max(J == JTOP)
-        u(:,J) = U_IN*(1.-(2.*((y(J) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
-    else
-        u(:,J) = 0;
-    end
-end
+% Properties air
+% init_u();
 v(:,:)   = 0.;    % Velocity in y-direction
 p(:,:)   = 0.;    % Relative pressure
 pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
@@ -113,12 +104,6 @@ b(:,:)   = 0.;	  % The general constant
 SP(:,:)  = 0.;    % Source term
 Su(:,:)  = 0.;	  % Source term
 
-% u(NPI+1,JBOT) = 0.5*U_IN;
-% u(NPI+1,JTOP) = 0.5*U_IN;
-
-% Important to avoid crash!! Othervise m_out calculated in subroutine globcont
-% would be zero at first iteration=>m_in/m_out =INF
-
 % Setting the relaxation parameters
 relax_u   = 0.8;            % See eq. 6.36
 relax_v   = relax_u;        % See eq. 6.37
@@ -127,4 +112,3 @@ relax_T   = 1.0;            % Relaxation factor for temperature
 relax_rho = 0.1;            % Relaxation factor for density
 % end of initilization=====================================================
 end
-

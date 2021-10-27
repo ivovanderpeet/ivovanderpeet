@@ -4,7 +4,7 @@ function [] = bound()
 % constants
 global NPI NPJ U_IN JBOT JTOP JMID HBOT HMID HTOP COFLOW
 % variables
-global  u v T y_v F_u v m_in_TOP m_out_TOP m_in_BOT m_out_BOT y
+global u v T y_v F_u v m_in_TOP m_out_TOP m_in_BOT m_out_BOT y
 
 % Fixed temperature in Kelvin of the incoming fluid
 if COFLOW == -1
@@ -13,15 +13,6 @@ elseif COFLOW == 1
     T(1,JBOT) = 273;
 end
 T(1,JTOP) = 573;
-
-% Setting the velocity at inlet
-for J = 1:NPJ+2
-    if max(J == JBOT)
-        u(2,J) = COFLOW*U_IN*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
-    elseif max(J == JTOP)
-        u(2,J) = U_IN*(1.-(2.*((y(J) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
-    end
-end
 
 % Zero temperature gradient at outer walls
 T(:, NPJ+2) = T(:, NPJ+1);
