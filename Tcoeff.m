@@ -2,10 +2,10 @@ function [] = Tcoeff()
 % Purpose: To calculate the coefficients for the T equation.
 
 % constants
-global NPI NPJ JMID
+global NPI NPJ JMID JTOP JBOT
 % variables
 global x x_u y y_v T Gamma SP Su F_u F_v relax_T Istart Iend Jstart Jend ...
-    b aE aW aN aS aP
+    b aE aW aN aS aP u
 
 Istart = 2;
 Iend = NPI+1;
@@ -42,6 +42,15 @@ for I = Istart:Iend
             + Gamma(I,J)*(y_v(j) - y(J-1))))*AREAs;
         Dn = ((Gamma(I,J)*Gamma(I,J+1))/(Gamma(I,J)*(y(J+1) - y_v(j+1)) ...
             + Gamma(I,J+1)*(y_v(j+1) - y(J))))*AREAn;
+%         if J == min(JTOP)
+%             Ds = 1e-1*(10.45 - u(i,J) + 10*sqrt(abs(u(i,J))))*AREAs;
+%         elseif J == max(JMID)
+%             Dn = 1e-1*(10.45 - u(i,J+1) + 10*sqrt(abs(u(i,J+1))))*AREAn;
+%         elseif J == min(JMID)
+%             Ds = 1e-1*(10.45 - u(i,J-1) + 10*sqrt(abs(u(i,J-1))))*AREAs;
+%         elseif J == max(JBOT)
+%             Dn = 1e-1*(10.45 - u(i,J) + 10*sqrt(abs(u(i,J))))*AREAn;
+%         end
         
         % The source terms
         SP(I,J) = 0.;

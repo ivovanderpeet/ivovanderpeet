@@ -2,10 +2,13 @@ function [] = init()
 % Purpose: To initilise all parameters.
 
 % constants
-global NPI NPJ LARGE U_IN XMAX YMAX JMID JBOT JTOP Dy HBOT HMID HTOP COFLOW
+global NPI NPJ XMAX YMAX JBOT JMID JTOP HBOT HMID HTOP 
+global LARGE U_IN Dy COFLOW
 % variables
-global x x_u y y_v u v pc p T rho mu Gamma Cp b SP Su d_u d_v omega SMAX SAVG ...
-    m_in m_out relax_u relax_v relax_pc relax_T relax_rho aP aE aW aN aS F_u F_v
+global x x_u y y_v u v pc p T rho mu Gamma Cp 
+global aP aE aW aN aS F_u F_v b SP Su d_u d_v 
+global SMAX SAVG relax_u relax_v relax_pc relax_T relax_rho omega
+global E E2 k om mut mueff yplus1 yplus2
 
 % begin: memalloc()=======================================================
 % allocate memory for variables
@@ -23,6 +26,15 @@ rho = zeros(NPI+2,NPJ+2);
 mu  = zeros(NPI+2,NPJ+2);
 Gamma = zeros(NPI+2,NPJ+2);
 Cp  = zeros(NPI+2,NPJ+2);
+
+E = zeros(NPI+2,NPJ+2);
+E2 = zeros(NPI+2,NPJ+2);
+k = zeros(NPI+2,NPJ+2);
+om = zeros(NPI+2,NPJ+2);
+mut = zeros(NPI+2,NPJ+2);
+mueff = zeros(NPI+2,NPJ+2);
+yplus1 = zeros(NPI+2,NPJ+2);
+yplus2 = zeros(NPI+2,NPJ+2);
 
 aP  = zeros(NPI+2,NPJ+2);
 aE  = zeros(NPI+2,NPJ+2);
@@ -87,17 +99,27 @@ SMAX = LARGE;
 SAVG = LARGE;
 
 % Properties air
-% init_u();
+for JJ = 1:NPJ+2
+    if max(JJ == JBOT)
+        u(:,JJ) = COFLOW*U_IN*(1.-(2.*(y(JJ)-HBOT/2.)/HBOT)^2); % inlet bot
+    elseif max(JJ == JTOP)
+        u(:,JJ) = U_IN*(1.-(2.*((y(JJ) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
+    else
+        u(:,JJ) = zeros(size(u(:,JJ)));
+    end
+end
 v(:,:)   = 0.;    % Velocity in y-direction
 p(:,:)   = 0.;    % Relative pressure
 pc(:,:)  = 0.;    % Pressure correction (equivalet to p' in ref. 1).
 T(:,:)   = 273.;  % Temperature
+T(:,JMID) = 373;
 T(:,JTOP) = 573.;
 rho(:,:) = 1.0;   % Density
 mu(:,:)  = 2.E-5; % Viscosity
 Cp(:,:)  = 1013.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
 Cp(:,JMID) = 385;
-Gamma    = 0.0315./Cp; % Thermal conductivity
+Gamma(:,:) = 0.0315./Cp; % Thermal conductivity
+Gamma(:,JMID) = 4;
 d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
 d_v(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
 b(:,:)   = 0.;	  % The general constant
