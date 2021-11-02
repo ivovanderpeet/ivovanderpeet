@@ -2,15 +2,14 @@ function [] = init()
 % Purpose: To initilise all parameters.
 
 % constants
-global NPI NPJ XMAX YMAX JBOT JMID JTOP HBOT HMID HTOP 
-global LARGE U_IN Dy COFLOW
+global NPI NPJ LARGE U_IN XMAX YMAX JBOT JMID JTOP COFLOW HBOT HMID HTOP Dy
 % variables
-global x x_u y y_v u v pc p T rho mu Gamma Cp 
-global aP aE aW aN aS F_u F_v b SP Su d_u d_v 
-global SMAX SAVG relax_u relax_v relax_pc relax_T relax_rho omega
-global E E2 k om mut mueff yplus1 yplus2
+global x x_u y y_v u v pc p T rho mu mut mueff Gamma Cp k eps delta E E2 yplus yplus1 ...
+    yplus2 uplus tw b SP Su d_u d_v omega SMAX SAVG relax_u relax_v ...
+    relax_pc relax_T aP aE aW aN aS F_u F_v ...
+    dudx dudy dvdx dvdy
 
-% begin: memalloc()=======================================================
+% begin: memalloc()========================================================
 % allocate memory for variables
 x   = zeros(1,NPI+2);
 x_u = zeros(1,NPI+2);
@@ -24,17 +23,25 @@ p   = zeros(NPI+2,NPJ+2);
 T   = zeros(NPI+2,NPJ+2);
 rho = zeros(NPI+2,NPJ+2);
 mu  = zeros(NPI+2,NPJ+2);
+mut  = zeros(NPI+2,NPJ+2);
+mueff  = zeros(NPI+2,NPJ+2);
 Gamma = zeros(NPI+2,NPJ+2);
 Cp  = zeros(NPI+2,NPJ+2);
+k  = zeros(NPI+2,NPJ+2);
+eps  = zeros(NPI+2,NPJ+2);
+delta  = zeros(NPI+2,NPJ+2);
+E  = zeros(NPI+2,NPJ+2);
+E2  = zeros(NPI+2,NPJ+2);
+yplus  = zeros(NPI+2,NPJ+2);
+yplus1  = zeros(NPI+2,NPJ+2);
+yplus2  = zeros(NPI+2,NPJ+2);
+uplus  = zeros(NPI+2,NPJ+2);
+tw  = zeros(NPI+2,NPJ+2);
 
-E = zeros(NPI+2,NPJ+2);
-E2 = zeros(NPI+2,NPJ+2);
-k = zeros(NPI+2,NPJ+2);
-om = zeros(NPI+2,NPJ+2);
-mut = zeros(NPI+2,NPJ+2);
-mueff = zeros(NPI+2,NPJ+2);
-yplus1 = zeros(NPI+2,NPJ+2);
-yplus2 = zeros(NPI+2,NPJ+2);
+dudx   = zeros(NPI+2,NPJ+2);
+dudy   = zeros(NPI+2,NPJ+2);
+dvdx   = zeros(NPI+2,NPJ+2);
+dvdy   = zeros(NPI+2,NPJ+2);
 
 aP  = zeros(NPI+2,NPJ+2);
 aE  = zeros(NPI+2,NPJ+2);
@@ -54,7 +61,7 @@ d_v = zeros(NPI+2,NPJ+2);
 % end of memory allocation=================================================
 
 % begin: grid()===========================================================
-% Purpose: Defining the geometrical variables. See fig. 6.2-6.4 in ref. 1
+% Purpose: Defining the geometrical variables See fig. 6.2-6.4 in ref. 1
 % Length of volume element
 Dx = XMAX/NPI;
 Dy = YMAX/NPJ;
@@ -67,7 +74,7 @@ for I = 3:NPI+1
 end
 x(NPI+2) = x(NPI+1) + 0.5*Dx;
 
-% Length variable for the scalar points T(I,J) in the y direction
+% Length variable for the scalar points T(i,j) in the y direction
 y(1) = 0.;
 y(2) = 0.5*Dy;
 for J = 3:NPJ+1
@@ -75,14 +82,14 @@ for J = 3:NPJ+1
 end
 y(NPJ+2) = y(NPJ+1) + 0.5*Dy;
 
-% Length variable for the velocity components u(i,J) in the x direction
+% Length variable for the velocity components u(i,j) in the x direction
 x_u(1) = 0.;
 x_u(2) = 0.;
 for i = 3:NPI+2
     x_u(i) = x_u(i-1) + Dx;
 end
 
-% Length variable for the velocity components v(I,j) in the y direction
+% Length variable for the velocity components v(i,j) in the y direction 
 y_v(1) = 0.;
 y_v(2) = 0.;
 for j = 3:NPJ+2
@@ -98,14 +105,11 @@ omega = 1.0; % Over-relaxation factor for SOR solver
 SMAX = LARGE;
 SAVG = LARGE;
 
-% Properties air
-for JJ = 1:NPJ+2
-    if max(JJ == JBOT)
-        u(:,JJ) = COFLOW*U_IN*(1.-(2.*(y(JJ)-HBOT/2.)/HBOT)^2); % inlet bot
-    elseif max(JJ == JTOP)
-        u(:,JJ) = U_IN*(1.-(2.*((y(JJ) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
-    else
-        u(:,JJ) = zeros(size(u(:,JJ)));
+for J = 1:NPJ+2
+    if max(J == JBOT)
+        u(:,J) = COFLOW*U_IN*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
+    elseif max(J == JTOP)
+        u(:,J) = U_IN*(1.-(2.*((y(J) - (HBOT+HMID))-HTOP/2.)/HTOP)^2); % inlet top
     end
 end
 v(:,:)   = 0.;    % Velocity in y-direction
@@ -120,17 +124,19 @@ Cp(:,:)  = 1013.; % J/(K*kg) Heat capacity - aSAVGed constant for this problem
 Cp(:,JMID) = 385;
 Gamma(:,:) = 0.0315./Cp; % Thermal conductivity
 Gamma(:,JMID) = 4;
-d_u(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
-d_v(:,:) = 0.;    % Variable d(i,j) to calculate pc defined in 6.23
-b(:,:)   = 0.;	  % The general constant
-SP(:,:)  = 0.;    % Source term
-Su(:,:)  = 0.;	  % Source term
+k(:,:)     = 1e-3;     % k
+eps(:,:)   = 1e-4;     % epsilon
+uplus(:,:) = 1.;       % uplus
+yplus1(:,:)= sqrt(rho .* u ./ mu) * (y(2) - y(1));   % yplus1
+yplus2(:,:)= sqrt(rho .* u ./ mu) * (y(NPJ+2) - y(NPJ+1));  % yplus2
+yplus(:,:) = 1.;       % yplus
+tw(:,:)    = 5.;       % tw
 
 % Setting the relaxation parameters
 relax_u   = 0.8;            % See eq. 6.36
 relax_v   = relax_u;        % See eq. 6.37
 relax_pc  = 1.1 - relax_u;  % See eq. 6.33
 relax_T   = 1.0;            % Relaxation factor for temperature
-relax_rho = 0.1;            % Relaxation factor for density
 % end of initilization=====================================================
 end
+
