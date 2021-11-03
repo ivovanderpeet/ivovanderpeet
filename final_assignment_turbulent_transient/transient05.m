@@ -261,11 +261,17 @@ xlim([0,XMAX])
 figure(4)
 surf(X,Y,k'); colorbar; title("k")
 view(0,90)
+hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(k))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(k))*ones(1,length(x)), 'r');
 xlim([0,XMAX])
 
-figure(4)
+figure(5)
 surf(X,Y,eps'); colorbar; title("eps")
 view(0,90)
+hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(eps))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(eps))*ones(1,length(x)), 'r');
 
 % figure(4)
 % surf(X,Y,Gamma'); colorbar; title("Gamma")

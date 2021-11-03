@@ -31,8 +31,8 @@ k(1,JTOP)     = 1.5*(U_IN*Ti)^2;
 eps(1,JBOT)   = Cmu^0.75 *k(1,JBOT).^1.5/(0.07*HBOT*0.5); % at inlet
 eps(1,JTOP)   = Cmu^0.75 *k(1,JTOP).^1.5/(0.07*HTOP*0.5); % at inlet
 for I = 1:NPI+2
-    eps(I,JMID) = eps(I,min(JTOP));
-    k(I,JMID) = k(I,min(JTOP));
+    eps(I,JMID) = (eps(I,min(JTOP))+eps(I,max(JBOT)))/2;
+    k(I,JMID) = (k(I,min(JTOP))+k(I,max(JBOT)))/2;
 end
 
 %% Outer wall boundary (adiabatic)
