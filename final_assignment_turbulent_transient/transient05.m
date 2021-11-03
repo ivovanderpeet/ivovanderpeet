@@ -14,10 +14,10 @@ close all
 clc
 %% declare all variables and contants
 % variables
-global x x_u y y_v u v pc T rho mu Gamma b SMAX SAVG aP aE aW aN aS eps k...
+global x x_u y y_v u v pc T rho mu Gamma b SMAX SAVG aP aE aW aN aS eps k Cp...
     u_old v_old pc_old T_old Dt eps_old k_old uplus yplus yplus1 yplus2 JBOT JMID JTOP HBOT HMID HTOP COFLOW p
 % constants
-global NPI NPJ XMAX YMAX LARGE U_IN SMALL Cmu sigmak sigmaeps C1eps C2eps kappa ERough Ti NPRINT d_u d_v
+global NPI NPJ XMAX YMAX LARGE U_IN SMALL Cmu sigmak sigmaeps C1eps C2eps kappa ERough Ti NPRINT d_u d_v Dy
 
 %% Configuration parameters
 COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
@@ -55,7 +55,7 @@ SMALL      = 1E-30;     % arbitrary very small value [-]
 
 % Input constants
 P_ATM      = 101000.;   % athmospheric pressure [Pa]
-U_IN       = 0.1;       % in flow velocity [m/s]
+U_IN       = 0.02;       % in flow velocity [m/s]
 
 % k-epsilon
 Cmu        = 0.09;
@@ -67,8 +67,8 @@ kappa      = 0.4187;
 ERough     = 9.793;
 Ti         = 0.04;
 
-Dt         = 0.001;
-TOTAL_TIME = 5;
+Dt         = 0.01;
+TOTAL_TIME = 100;
 
 %% start main function here
 init(); % initialization
@@ -173,9 +173,9 @@ end % end of calculation
 close(f)
 
 %% plot vector map
-[X,Y]=meshgrid(x_u,y_v);
-quiver(X,Y,u',v',0.05);
-%axis equal;
+[X,Y]=meshgrid(x,y);
+[Xu,Yv]=meshgrid(x_u,y_v);
+quiver(Xu,Yv,u',v',0.05);
 
 figure(1)
 quiver(X,Y, u', v',1.5); hold on; title("Velocity")
@@ -190,7 +190,6 @@ view(0,90); hold on
 plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(T))*ones(1,length(x)), 'r');
 plot3(x, HBOT*ones(1,length(x)), max(max(T))*ones(1,length(x)), 'r');
 xlim([0,XMAX])
-% ylim([-XMAX/4,XMAX/4])
 
 p(:,JMID) = 0;
 
@@ -201,7 +200,6 @@ plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(p))*ones(1,length(x)), 'r');
 plot3(x, HBOT*ones(1,length(x)), max(max(p))*ones(1,length(x)), 'r');
 view(0,90)
 xlim([0,XMAX])
-% ylim([-XMAX/4,XMAX/4])
 
 figure(4)
 surf(X,Y,k'); colorbar; title("k")
@@ -218,14 +216,31 @@ hold on
 plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(eps))*ones(1,length(x)), 'r');
 plot3(x, HBOT*ones(1,length(x)), max(max(eps))*ones(1,length(x)), 'r');
 
-% figure(4)
-% surf(X,Y,Gamma'); colorbar; title("Gamma")
-% view(0,90)
-% 
-% figure(5)
-% surf(X,Y,Cp'); colorbar; title("Heat capacity")
-% view(0,90)
-% 
-% figure(6)
-% surf(X,Y,rho'); colorbar; title("Density")
-% view(0,90)
+%% Check balance
+if COFLOW == 1
+    m_in_bot = u(2,JBOT).*rho(2,JBOT)*Dy;
+    m_out_bot = u(NPI+1,JBOT).*rho(NPI+1,JBOT)*Dy;
+
+    Q_in_bot = sum(m_in_bot.*Cp(2,JBOT).*T(2,JBOT));
+    Q_out_bot = sum(m_out_bot.*Cp(NPI+1,JBOT).*T(NPI+1,JBOT));
+elseif COFLOW == -1
+    m_in_bot = abs(u(NPI+1,JBOT).*rho(NPI+1,JBOT)*Dy);
+    m_out_bot = abs(u(2,JBOT).*rho(2,JBOT)*Dy);
+
+    Q_in_bot = sum(m_in_bot.*Cp(NPI+1,JBOT).*T(NPI+1,JBOT));
+    Q_out_bot = sum(m_out_bot.*Cp(2,JBOT).*T(2,JBOT));
+end
+
+m_in_top = u(2,JTOP).*rho(2,JTOP)*Dy;
+m_out_top = u(NPI+1,JTOP).*rho(NPI+1,JTOP)*Dy;
+
+Q_in_top = sum(m_in_top.*Cp(2,JTOP).*T(2,JTOP));
+Q_out_top = sum(m_out_top.*Cp(NPI+1,JTOP).*T(NPI+1,JTOP));
+
+dQ_bot = Q_out_bot - Q_in_bot;
+dQ_top = Q_out_top - Q_in_top;
+
+Q_in = Q_in_top + Q_in_bot;
+Q_out = Q_out_top + Q_out_bot;
+
+fprintf("\ndQ_bot =%10.2e \t Q_in  =%10.2e \ndQ_top =%10.2e \t Q_out =%10.2e \n\n", dQ_bot, Q_in, dQ_top, Q_out)

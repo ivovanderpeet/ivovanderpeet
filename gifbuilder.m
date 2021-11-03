@@ -4,7 +4,7 @@ filename = 'testAnimated.gif';
 for time = Dt:10*Dt:TOTAL_TIME
 
     T_plot = TMID(:,round(time/Dt));
-    plot(x',T_plot); title(sprintf("Time = %10.3e", time));
+    plot(x',T_plot); title(sprintf("Time = %3.3f s", time));
     xlim([0, max(x)]); grid on
 %     ylim([421.5, 424.5]);
     drawnow
