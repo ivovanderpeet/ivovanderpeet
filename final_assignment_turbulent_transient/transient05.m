@@ -55,7 +55,7 @@ SMALL      = 1E-30;     % arbitrary very small value [-]
 
 % Input constants
 P_ATM      = 101000.;   % athmospheric pressure [Pa]
-U_IN       = 1.;       % in flow velocity [m/s]
+U_IN       = 0.1;       % in flow velocity [m/s]
 
 % k-epsilon
 Cmu        = 0.09;
@@ -67,14 +67,18 @@ kappa      = 0.4187;
 ERough     = 9.793;
 Ti         = 0.04;
 
-Dt         = 0.01;
-TOTAL_TIME = 1;
+Dt         = 0.001;
+TOTAL_TIME = 5;
 
 %% start main function here
 init(); % initialization
 bound(); % apply boundary conditions
 
+f = waitbar(0,'Nou we gaan beginnen hoor');
+TMID = zeros(length(x),round(TOTAL_TIME/Dt));
+
 for time = Dt:Dt:TOTAL_TIME
+    waitbar(time/TOTAL_TIME,f,'Even geduld pik');
     iter = 0;
     
     % outer iteration loop
@@ -155,78 +159,18 @@ for time = Dt:Dt:TOTAL_TIME
     fprintf ("%4d %10.3e\t%10.2e\t%10.2e\t%10.2e\t%10.2e\t%10.2e\n",iter,...
         time,u(ceil(3*(NPI+1)/10),ceil(2*(NPJ+1)/5)),v(ceil(3*(NPI+1)/10),ceil(2*(NPJ+1)/5)),...
         T(ceil(3*(NPI+1)/10),ceil(2*(NPJ+1)/5)), SMAX, SAVG);
-    % end: printConv(time, iter)===========================================
+%     end: printConv(time, iter)===========================================
     
     % reset SMAX and SAVG
     SMAX = LARGE;
     SAVG = LARGE;   
+
+    TMID(:,round(time/Dt)) = mean(T(:,JMID)')';
+
+
 end % end of calculation
 
-% %% begin: output()
-% % Print all results in output.txt
-% fp = fopen('output.txt','w');
-% for I = 1:NPI+1
-%     i = I;
-%     for J = 2:NPJ+1
-%         j = J;
-%         ugrid = 0.5*(u(i,J)+u(i+1,J)); % interpolated horizontal velocity
-%         vgrid = 0.5*(v(I,j)+v(I,j+1)); % interpolated vertical velocity
-%         fprintf(fp,'%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\n',...
-%             x(I), y(J), ugrid, vgrid, pc(I,J), T(I,J), rho(I,J), mu(I,J), Gamma(I,J), ...
-%             k(I,J), eps(I,J), uplus(I,J), yplus(I,J), yplus1(I,J), yplus2(I,J));
-%     end
-%     fprintf(fp, '\n');
-% end
-% fclose(fp);
-% 
-% % Plot vorticity in vort.txt
-% vort = fopen('vort.txt','w');
-% for I = 2:NPI+1
-%     i = I;
-%     for J = 2:NPJ+1
-%         j = J;
-%         vorticity = (u(i,J) - u(i,J-1)) / (y(J) - y(J-1)) - (v(I,j) - v(I-1,j)) / (x(I) - x(I-1));
-%         fprintf(vort, '%11.5e\t%11.5e\t%11.5e\n',x(I), y(J), vorticity);
-%     end
-%     fprintf(vort,'\n');
-% end
-% fclose(vort);
-% 
-% % Plot streamlines in str.txt
-% str = fopen('str.txt', 'w');
-% for I = 1:NPI+1
-%     i = I;
-%     for J = 1:NPJ+1
-%         j = J;
-%         stream = -0.5*(v(I+1,j)+v(I,j))*(x(I+1)-x(I))+0.5*(u(i,J+1)+u(i,J))*(y(J+1)-y(J));
-%         fprintf(str, '%11.5e\t%11.5e\t%11.5e\n',x(I), y(J), stream);
-%     end
-%     fprintf(str,'\n');
-% end
-% fclose(str);
-% 
-% % Plot horizontal velocity components in velu.txt
-% velu = fopen('velu.txt','w');
-% for I = 2:NPI+2
-%     i = I;
-%     for J = 1:NPJ+2
-%         fprintf(velu, '%11.5e\t%11.5e\t%11.5e\n',x_u(i), y(J), u(i,J));
-%     end
-%     fprintf(velu, '\n');
-% end
-% fclose(velu);
-% 
-% % Plot vertical velocity components in velv.txt
-% velv = fopen('velv.txt','w');
-% for I = 1:NPI+2
-%     for J = 2:NPJ+2
-%         j = J;
-%         fprintf(velv, '%11.5e\t%11.5e\t%11.5e\n',x(I), y_v(j), v(I,j));
-%     end
-%     fprintf(velv,'\n');
-% end
-% fclose(velv);
-% % end output()
+close(f)
 
 %% plot vector map
 [X,Y]=meshgrid(x_u,y_v);
@@ -248,6 +192,7 @@ plot3(x, HBOT*ones(1,length(x)), max(max(T))*ones(1,length(x)), 'r');
 xlim([0,XMAX])
 % ylim([-XMAX/4,XMAX/4])
 
+p(:,JMID) = 0;
 
 figure(3)
 surf(X,Y,p'); colorbar; title("Pressure")

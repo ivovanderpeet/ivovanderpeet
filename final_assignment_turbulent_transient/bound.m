@@ -87,12 +87,4 @@ end
 % MID (Otherwise both ends of the wall will always have the initial temperature)
 T(NPI+2,JMID) = T(NPI+1,JMID);
 T(1,JMID)     = T(2,JMID);
-
-% % Velocity and temperature gradient at outlet = zero:
-% % Correction factor m_in/m_out is used to satisfy global continuity
-% u(NPI+2,2:NPJ+1) = u(NPI+1,2:NPJ+1)*m_in/m_out;
-% v(NPI+2,2:NPJ+1) = v(NPI+1,2:NPJ+1);
-% k(NPI+2,2:NPJ+1) = k(NPI+1,2:NPJ+1);
-% eps(NPI+2,2:NPJ+1) = eps(NPI+1,2:NPJ+1);
-% T(NPI+2,1:NPJ+2) = T(NPI+1,1:NPJ+2);
 end
