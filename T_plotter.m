@@ -5,8 +5,6 @@ xlabel('Length [m]');
 ylabel('Temperature [K]');
 title('Transient behavior of mean wall temperature')
 
-
-
 NPLOT = 4;
 tPLOT = [25 50 100];
 
