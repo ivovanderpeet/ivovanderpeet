@@ -41,18 +41,7 @@ for I = Istart:Iend
         % The source terms
         mus = 0.25*(mueff(I-1,J) + mueff(I,J) + mueff(I-1,J-1) + mueff(I,J-1));
         mun = 0.25*(mueff(I-1,J+1) + mueff(I,J+1) + mueff(I-1,J) + mueff(I,J));
-        
-        % LAW OF THE WALL
-        if J==2 || J==NPJ+1 || isequal(J,max(JBOT)) || isequal(J,min(JTOP))
-            if yplus(I,J) < 11.63
-                SP(i,J) = -mu(I,J)*AREAs/(0.5*AREAw);
-            else
-                SP(i,J) = -rho(I,J) * Cmu^0.25 * k(I,J)^0.5 / uplus(I,J) *AREAs;
-            end
-        else
-            SP(i,J) = 0.;
-        end
-        
+        SP(i,J) = 0.;
         Su(i,J) = (mueff(I,J)*dudx(I,J) - mueff(I-1,J)*dudx(I-1,J)) / (x(I) - x(I-1)) + ...
             (mun*dvdx(i,j+1) - mus*dvdx(i,j)) / (y_v(j+1) - y_v(j)) - ...
             2./3. * (rho(I,J)*k(I,J) - rho(I-1,J)*k(I-1,J))/(x(I) - x(I-1));
@@ -66,17 +55,8 @@ for I = Istart:Iend
         % The coefficients (hybrid differencing scheme)
         aW(i,J) = max([ Fw, Dw + Fw/2, 0.]);
         aE(i,J) = max([-Fe, De - Fe/2, 0.]);
-        if J==2 || isequal(J,min(JTOP))
-            aS(i,J) = 0.;
-        else
-            aS(i,J) = max([ Fs, Ds + Fs/2, 0.]);
-        end
-        
-        if (J==NPJ+1) || isequal(J,max(JBOT))
-            aN(i,J) = 0.;
-        else
-            aN(i,J) = max([-Fn, Dn - Fn/2, 0.]);
-        end
+        aS(i,J) = max([ Fs, Ds + Fs/2, 0.]);
+        aN(i,J) = max([-Fn, Dn - Fn/2, 0.]);
         aPold   = 0.5*(rho(I-1,J) + rho(I,J))*AREAe*AREAn/Dt;
         
         % eq. 8.31 without time dependent terms (see also eq. 5.14):

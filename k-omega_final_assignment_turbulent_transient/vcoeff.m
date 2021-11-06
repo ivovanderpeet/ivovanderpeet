@@ -2,7 +2,7 @@ function [] = vcoeff()
 % Purpose: To calculate the coefficients for the v equation.
 
 % constants
-global NPI NPJ JMID LARGE Dt
+global NPI NPJ JMID LARGE Dt Cmu
 % variables
 global x x_u y y_v v p mueff SP Su F_u F_v d_v relax_v v_old rho Istart Iend ...
     Jstart Jend b aE aW aN aS aP dvdy dudy k

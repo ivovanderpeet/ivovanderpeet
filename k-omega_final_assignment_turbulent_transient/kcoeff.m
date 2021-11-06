@@ -6,7 +6,7 @@ global NPI NPJ JBOT JMID JTOP LARGE
 global Dt sigmak Cmu
 % variables
 global x x_u y y_v SP Su F_u F_v mut rho u uplus tw Istart Iend ...
-    Jstart Jend b aE aW aN aS aP k k_old omega E2 mu betastar delta
+    Jstart Jend b aE aW aN aS aP k k_old omega E2 betastar delta gamma_k
 
 Istart = 2;
 Iend = NPI+1;
@@ -37,52 +37,31 @@ for I = Istart:Iend
         % eq. 6.9e-6.9h - the transport by diffusion defined in eq. 5.8b
         % note: D = mu/Dx but Dw = (mu/Dx)*AREAw per definition
         % The conductivity, Gamma, at the interface is calculated with the use of a harmonic mean.
-        Dwt = mut(I-1,J)*mut(I,J)/sigmak/(mut(I-1,J)*(x(I) - x_u(i)) + ...
-            mut(I,J)*(x_u(i)-x(I-1)))*AREAw;
-        Det = mut(I,J)*mut(I+1,J)/sigmak/(mut(I,J)*(x(I+1) - x_u(i+1)) + ...
-            mut(I+1,J)*(x_u(i+1)-x(I)))*AREAe;
-        Dst = mut(I,J-1)*mut(I,J)/sigmak/(mut(I,J-1)*(y(J) - y_v(j)) + ...
-            mut(I,J)*(y_v(j)-y(J-1)))*AREAs;
-        Dnt = mut(I,J)*mut(I,J+1)/sigmak/(mut(I,J)*(y(J+1) - y_v(j+1)) + ...
-            mut(I,J+1)*(y_v(j+1)-y(J)))*AREAn;
-        
-        Dw = Dwt + mu(I-1,J)*mu(I,J)/(mu(I-1,J)*(x(I) - x_u(i)) + ...
-            mu(I,J)*(x_u(i)-x(I-1)))*AREAw;
-        De = Det + mu(I,J)*mu(I+1,J)/(mu(I,J)*(x(I+1) - x_u(i+1)) + ...
-            mu(I+1,J)*(x_u(i+1)-x(I)))*AREAe;
-        Ds = Dst + mu(I,J-1)*mu(I,J)/(mu(I,J-1)*(y(J) - y_v(j)) + ...
-            mu(I,J)*(y_v(j)-y(J-1)))*AREAs;
-        Dn = Dnt + mu(I,J)*mu(I,J+1)/(mu(I,J)*(y(J+1) - y_v(j+1)) + ...
-            mu(I,J+1)*(y_v(j+1)-y(J)))*AREAn;
+        Dw = gamma_k(I-1,J)*gamma_k(I,J)/(gamma_k(I-1,J)*(x(I) - x_u(i)) + ...
+            gamma_k(I,J)*(x_u(i)-x(I-1)))*AREAw;
+        De = gamma_k(I,J)*gamma_k(I+1,J)/(gamma_k(I,J)*(x(I+1) - x_u(i+1)) + ...
+            gamma_k(I+1,J)*(x_u(i+1)-x(I)))*AREAe;
+        Ds = gamma_k(I,J-1)*gamma_k(I,J)/(gamma_k(I,J-1)*(y(J) - y_v(j)) + ...
+            gamma_k(I,J)*(y_v(j)-y(J-1)))*AREAs;
+        Dn = gamma_k(I,J)*gamma_k(I,J+1)/(gamma_k(I,J)*(y(J+1) - y_v(j+1)) + ...
+            gamma_k(I,J+1)*(y_v(j+1)-y(J)))*AREAn;
         
         % The source terms
-        if J==2 || J==NPJ+1 || isequal(J,max(JBOT)) || isequal(J,min(JTOP))
-            SP(I,J) = -rho(I,J)*Cmu^0.75*k(I,J)^0.5*uplus(I,J)/(0.5*AREAw)*AREAs*AREAw;
-            Su(I,J) = tw(I,J)*0.5*(abs(u(i,J)) + abs(u(i+1,J)))/(0.5*AREAw)*AREAs*AREAw;
-        else
-            SP(I,J) = -betastar*rho(I,J)*omega(I,J);
-            Su(I,J) = 2.0*mut(I,J)*E2(I,J)-2/3*rho(I,J)*k(I,J)*delta(I,J);
-        end
+        SP(I,J) = -betastar*rho(I,J)*omega(I,J);
+        Su(I,J) = 2.0*mut(I,J)*E2(I,J);%-2/3*rho(I,J)*k(I,J)*delta(I,J);
         
         Su(I,J) =  Su(I,J)*AREAw*AREAs;
         SP(I,J) =  SP(I,J)*AREAw*AREAs;
         
-        
+        if max(J == JMID)
+            SP(I,J) = -LARGE;
+        end
+
         % The coefficients (hybrid differencing scheme)
         aW(I,J) = max([ Fw, Dw + Fw/2, 0.]);
         aE(I,J) = max([-Fe, De - Fe/2, 0.]);
-        if J==2 || isequal(J,min(JTOP))
-            aS(I,J) = 0;
-        else
-            aS(I,J) = max([ Fs, Ds + Fs/2, 0.]);
-        end
-        
-        if J==NPJ+1 || isequal(J,max(JBOT))
-            aN(I,J) = 0;
-        else
-            aN(I,J) = max([-Fn, Dn - Fn/2, 0.]);
-        end
-        
+        aS(I,J) = max([ Fs, Ds + Fs/2, 0.]);
+        aN(I,J) = max([-Fn, Dn - Fn/2, 0.]);
         aPold   =  rho(I,J)*AREAe*AREAn/Dt;
         
         % eq. 8.31 with time dependent terms (see also eq. 5.14):

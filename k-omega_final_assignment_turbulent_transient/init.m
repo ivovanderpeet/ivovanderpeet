@@ -5,9 +5,9 @@ function [] = init()
 global NPI NPJ LARGE U_IN XMAX YMAX JBOT JMID JTOP COFLOW HBOT HMID HTOP Dy
 % variables
 global x x_u y y_v u v pc p T rho mu mut mueff Gamma Cp k omega delta E E2 yplus yplus1 ...
-    yplus2 uplus tw b SP Su d_u d_v omega SMAX SAVG m_in m_out relax_u relax_v ...
+    yplus2 uplus tw b SP Su d_u d_v SMAX SAVG relax_u relax_v ...
     relax_pc relax_T aP aE aW aN aS F_u F_v u_old v_old pc_old T_old k_old ...
-    omega_old dudx dudy dvdx dvdy
+    omega_old dudx dudy dvdx dvdy gamma_k gamma_om
 
 % begin: memalloc()========================================================
 % allocate memory for variables
@@ -26,6 +26,8 @@ mu  = zeros(NPI+2,NPJ+2);
 mut  = zeros(NPI+2,NPJ+2);
 mueff  = zeros(NPI+2,NPJ+2);
 Gamma = zeros(NPI+2,NPJ+2);
+gamma_k = zeros(NPI+2,NPJ+2);
+gamma_om = zeros(NPI+2,NPJ+2);
 Cp  = zeros(NPI+2,NPJ+2);
 k  = zeros(NPI+2,NPJ+2);
 omega  = zeros(NPI+2,NPJ+2);

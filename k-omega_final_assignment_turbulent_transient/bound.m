@@ -16,7 +16,7 @@ if COFLOW == -1
     u(NPI+1,JBOT) = COFLOW*U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
     T(NPI+2,JBOT) = 273+10;
     k(NPI+2,JBOT) = 1.5*(U_IN*Ti)^2;
-    omega(NPI+2,JBOT) = k(1,JBOT).^0.5/(0.07*HBOT*0.5);
+    omega(NPI+2,JBOT) = k(NPI+2,JBOT).^0.5/(0.07*HBOT*0.5);
 elseif COFLOW == 1
     u(2,JBOT) = COFLOW*U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
     T(1,JBOT) = 273+10;
@@ -31,6 +31,7 @@ omega(1,JTOP)   = k(1,JTOP).^0.5/(0.07*HTOP*0.5); % at inlet
 
 % Set omega to LARGE at near-wall element
 omega(:,[1, NPJ+2]) = BIG;
+k(:,[1, NPJ+2]) = 0;
 
 %% Outer wall boundary (adiabatic)
 T(:, NPJ+2) = T(:, NPJ+1);
@@ -69,8 +70,6 @@ k(NPI+2,JTOP) = k(NPI+1,JTOP);
 omega(NPI+2,JTOP) = omega(NPI+1,JTOP);
 
 % BOT
-u(NPI+2,JBOT) = u(NPI+1,JBOT)*m_in_BOT/m_out_BOT;
-v(NPI+2,JBOT) = v(NPI+1,JBOT);
 if COFLOW == -1
     u(1,JBOT) = u(2,JBOT)*m_in_BOT/m_out_BOT;
     v(1,JBOT) = v(2,JBOT);
@@ -88,4 +87,8 @@ end
 % MID (Otherwise both ends of the wall will always have the initial temperature)
 T(NPI+2,JMID) = T(NPI+1,JMID);
 T(1,JMID)     = T(2,JMID);
+k(NPI+2,JMID) = k(NPI+1,JMID);
+k(1,JMID)     = k(2,JMID);
+omega(NPI+2,JMID) = omega(NPI+1,JMID);
+omega(1,JMID)     = omega(2,JMID);
 end

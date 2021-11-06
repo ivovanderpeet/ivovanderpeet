@@ -25,12 +25,12 @@ global sigmak sigmaom gamma1 beta1 betastar ERough Ti Cmu kappa
 global NPRINT COFLOW Dt U_IN
 
 %% Configuration parameters
-COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
+COFLOW = 1; % set to -1 for counterflow, or 1 for coflow
 
 %% Constants
 % Domain
 % Domain
-NPI        = 400;       % number of grid cells in x-direction [-]
+NPI        = 200;       % number of grid cells in x-direction [-]
 NPJ        = 40;        % number of grid cells in y-direction [-]
 XMAX       = 0.20;      % width of the domain [m]
 HBOT       = 0.01;
@@ -48,8 +48,8 @@ U_ITER     = 1;         % number of Newton iterations for u equation [-]
 V_ITER     = 15;         % number of Newton iterations for v equation [-]
 PC_ITER    = 30;        % number of Newton iterations for pc equation [-]
 T_ITER     = 1;         % number of Newton iterations for T equation [-]
-OMEGA_ITER = 1;         % number of Newton iterations for omega equation [-]
-K_ITER     = 1;         % number of Newton iterations for K equation [-]
+OMEGA_ITER = 100;         % number of Newton iterations for omega equation [-]
+K_ITER     = 100;         % number of Newton iterations for K equation [-]
 NPRINT     = 1;
 
 % Accuracy
@@ -74,8 +74,8 @@ Ti         = 0.04;
 Cmu        = 0.09;
 kappa      = 0.4187;
 
-Dt         = 0.05;
-TOTAL_TIME = 10;
+Dt         = 0.01;
+TOTAL_TIME = 5;
 
 %% start main function here
 init(); % initialization
@@ -88,11 +88,6 @@ for time = Dt:Dt:TOTAL_TIME
     waitbar(time/TOTAL_TIME,f,'Even geduld pik');
     iter = 0;
 
-    if time == 5
-        SMAXneeded = 1E-4;      % maximum accepted error in mass balance [kg/s]
-        SAVGneeded = 1E-5;      % maximum accepted average error in mass balance [kg/s]
-    end
-    
     % outer iteration loop
     while iter < MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded
         
@@ -120,6 +115,7 @@ for time = Dt:Dt:TOTAL_TIME
         for iter_k = 1:K_ITER
             k = solve(k, b, aE, aW, aN, aS, aP);
             if min(min(k)) < 0
+                fprintf('k is negatief')
                 return;
             end
         end
@@ -231,7 +227,34 @@ hold on
 plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(omega))*ones(1,length(x)), 'r');
 plot3(x, HBOT*ones(1,length(x)), max(max(omega))*ones(1,length(x)), 'r');
 
+omega_small = zeros(NPI+2,NPJ+2);
+for ii = 1:NPI+2
+    for jj = 1:NPJ+2
+        if omega(ii,jj) < 1e9
+        omega_small(ii,jj) = omega(ii,jj);
+        else
+            omega_small(ii,jj) = 0;
+        end
+    end
+end
+
+omega_log = log10(omega);
+
 figure(6)
+surf(X,Y,omega_small'); colorbar; title("omega\_small")
+view(0,90)
+hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(omega_small))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(omega_small))*ones(1,length(x)), 'r');
+
+figure(7)
+surf(X,Y,omega_log'); colorbar; title("omega\_log")
+view(0,90)
+hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(omega_log))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(omega_log))*ones(1,length(x)), 'r');
+
+figure(8)
 surf(X,Y,u'); colorbar; title("u")
 view(0,90)
 hold on
