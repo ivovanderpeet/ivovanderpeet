@@ -30,9 +30,9 @@ COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
 %% Constants
 % Domain
 % Domain
-NPI        = 100;       % number of grid cells in x-direction [-]
+NPI        = 400;       % number of grid cells in x-direction [-]
 NPJ        = 40;        % number of grid cells in y-direction [-]
-XMAX       = 0.30;      % width of the domain [m]
+XMAX       = 0.20;      % width of the domain [m]
 HBOT       = 0.01;
 HTOP       = 0.01;
 HMID       = 0.002;
@@ -53,15 +53,15 @@ K_ITER     = 1;         % number of Newton iterations for K equation [-]
 NPRINT     = 1;
 
 % Accuracy
-SMAXneeded = 1E-6;      % maximum accepted error in mass balance [kg/s]
-SAVGneeded = 1E-7;      % maximum accepted average error in mass balance [kg/s]
+SMAXneeded = 1E-3;      % maximum accepted error in mass balance [kg/s]
+SAVGneeded = 1E-4;      % maximum accepted average error in mass balance [kg/s]
 LARGE      = 1E30;      % arbitrary very large value [-]
 SMALL      = 1E-30;     % arbitrary very small value [-]
 BIG        = 1E10;
 
 % Input constants
 P_ATM      = 101000.;   % athmospheric pressure [Pa]
-U_IN       = 0.02;       % in flow velocity [m/s]
+U_IN       = 0.1;       % in flow velocity [m/s]
 
 % k-epsilon
 sigmak     = 2.;
@@ -74,9 +74,8 @@ Ti         = 0.04;
 Cmu        = 0.09;
 kappa      = 0.4187;
 
-
 Dt         = 0.05;
-TOTAL_TIME = 100;
+TOTAL_TIME = 10;
 
 %% start main function here
 init(); % initialization
@@ -88,6 +87,11 @@ TMID = zeros(length(x),round(TOTAL_TIME/Dt));
 for time = Dt:Dt:TOTAL_TIME
     waitbar(time/TOTAL_TIME,f,'Even geduld pik');
     iter = 0;
+
+    if time == 5
+        SMAXneeded = 1E-4;      % maximum accepted error in mass balance [kg/s]
+        SAVGneeded = 1E-5;      % maximum accepted average error in mass balance [kg/s]
+    end
     
     % outer iteration loop
     while iter < MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded
@@ -219,12 +223,18 @@ hold on
 plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(k))*ones(1,length(x)), 'r');
 plot3(x, HBOT*ones(1,length(x)), max(max(k))*ones(1,length(x)), 'r');
 xlim([0,XMAX])
+
 figure(5)
 surf(X,Y,omega'); colorbar; title("omega")
 view(0,90)
 hold on
 plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(omega))*ones(1,length(x)), 'r');
 plot3(x, HBOT*ones(1,length(x)), max(max(omega))*ones(1,length(x)), 'r');
+
+figure(6)
+surf(X,Y,u'); colorbar; title("u")
+view(0,90)
+hold on
 
 %% Check balance
 if COFLOW == 1

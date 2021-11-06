@@ -124,9 +124,9 @@ end
 
 v(:,:)     = 0.;       % Velocity in y-direction
 p(:,:)     = 0.;       % Relative pressure
-T(:,:)     = 273+20.;     % Temperature
+T(:,:)     = 273+10.;     % Temperature
 T(:,JMID)  = 273+50.;
-T(:,JTOP)  = 273+80.;
+T(:,JTOP)  = 273+90.;
 % rho(:,:)   = 1.0;      % Density
 rho(:,:) = 1000;
 rho(:,JMID) = 9e3;

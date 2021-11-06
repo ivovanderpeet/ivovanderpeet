@@ -11,22 +11,21 @@ global m_in_TOP m_out_TOP m_in_BOT m_out_BOT
 global k omega
 
 %% Inflow properties
-% Velocity profile
-u(2,JBOT) = COFLOW*U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
-u(2,JTOP) = U_IN*(1.-(2.*((y(JTOP) - (HBOT+HMID))-HTOP/2.)/HTOP).^2);
-
-% Temperature, k, omega
+% Velocity, temperature, k, omega
 if COFLOW == -1
-    T(NPI+2,JBOT) = 273+20;
+    u(NPI+1,JBOT) = COFLOW*U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
+    T(NPI+2,JBOT) = 273+10;
     k(NPI+2,JBOT) = 1.5*(U_IN*Ti)^2;
     omega(NPI+2,JBOT) = k(1,JBOT).^0.5/(0.07*HBOT*0.5);
 elseif COFLOW == 1
-    T(1,JBOT) = 273+20;
+    u(2,JBOT) = COFLOW*U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
+    T(1,JBOT) = 273+10;
     k(1,JBOT) = 1.5*(U_IN*Ti)^2;
     omega(1,JBOT) = k(1,JBOT).^0.5/(0.07*HBOT*0.5); % at inlet https://www.cfd-online.com/Wiki/Turbulence_free-stream_boundary_conditions
 end
 
-T(1,JTOP) = 273+80;
+u(2,JTOP) = U_IN*(1.-(2.*((y(JTOP) - (HBOT+HMID))-HTOP/2.)/HTOP).^2);
+T(1,JTOP) = 273+90;
 k(1,JTOP)     = 1.5*(U_IN*Ti)^2;
 omega(1,JTOP)   = k(1,JTOP).^0.5/(0.07*HTOP*0.5); % at inlet
 
@@ -73,10 +72,14 @@ omega(NPI+2,JTOP) = omega(NPI+1,JTOP);
 u(NPI+2,JBOT) = u(NPI+1,JBOT)*m_in_BOT/m_out_BOT;
 v(NPI+2,JBOT) = v(NPI+1,JBOT);
 if COFLOW == -1
+    u(1,JBOT) = u(2,JBOT)*m_in_BOT/m_out_BOT;
+    v(1,JBOT) = v(2,JBOT);
     T(1,JBOT) = T(2,JBOT);
     k(1,JBOT) = k(2,JBOT);
     omega(1,JBOT) = omega(2,JBOT);
 elseif COFLOW == 1
+    u(NPI+2,JBOT) = u(NPI+1,JBOT)*m_in_BOT/m_out_BOT;
+    v(NPI+2,JBOT) = v(NPI+1,JBOT);
     T(NPI+2,JBOT) = T(NPI+1,JBOT);
     k(NPI+2,JBOT) = k(NPI+1,JBOT);
     omega(NPI+2,JBOT) = omega(NPI+1,JBOT);
