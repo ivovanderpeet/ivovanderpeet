@@ -25,17 +25,16 @@ global sigmak sigmaom gamma1 beta1 betastar ERough Ti Cmu kappa
 global NPRINT COFLOW Dt U_IN
 
 %% Configuration parameters
-COFLOW = 1; % set to -1 for counterflow, or 1 for coflow
+COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
 
 %% Constants
 % Domain
-% Domain
-NPI        = 200;       % number of grid cells in x-direction [-]
-NPJ        = 40;        % number of grid cells in y-direction [-]
+NPI        = 100;       % number of grid cells in x-direction [-]
+NPJ        = 100;        % number of grid cells in y-direction [-]
 XMAX       = 0.20;      % width of the domain [m]
-HBOT       = 0.01;
-HTOP       = 0.01;
-HMID       = 0.002;
+HBOT       = 0.1;
+HTOP       = 0.1;
+HMID       = 0.02;
 YMAX       = HBOT + HMID + HTOP;  % height of the domain [m]
 
 JBOT = 2:ceil((NPJ+1)/YMAX*HBOT);
@@ -69,13 +68,13 @@ sigmaom    = 2.;
 gamma1     = 0.553;
 beta1      = 0.075;
 betastar   = 0.09;
-ERough     = 9.793;
+% ERough     = 9.793;
 Ti         = 0.04;
 Cmu        = 0.09;
 kappa      = 0.4187;
 
-Dt         = 0.01;
-TOTAL_TIME = 5;
+Dt         = 0.05;
+TOTAL_TIME = 50;
 
 %% start main function here
 init(); % initialization
@@ -92,6 +91,7 @@ for time = Dt:Dt:TOTAL_TIME
     while iter < MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded
         
         derivatives();
+
         ucoeff();
         for iter_u = 1:U_ITER
             u = solve(u, b, aE, aW, aN, aS, aP);
@@ -114,16 +114,15 @@ for time = Dt:Dt:TOTAL_TIME
         kcoeff();
         for iter_k = 1:K_ITER
             k = solve(k, b, aE, aW, aN, aS, aP);
-            if min(min(k)) < 0
-                fprintf('k is negatief')
-                return;
-            end
         end
         
         omcoeff();
         for iter_eps = 1:OMEGA_ITER
             omega = solve(omega, b, aE, aW, aN, aS, aP);
         end
+            
+        % BEUN methode
+%         omega(:,JBOT) = flip(omega(:,JTOP),2);
         
         Tcoeff();
         for iter_T = 1:T_ITER

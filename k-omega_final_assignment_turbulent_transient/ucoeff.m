@@ -4,8 +4,8 @@ function [] = ucoeff()
 % constants
 global NPI NPJ JBOT JMID JTOP LARGE Dt Cmu
 % variables
-global x x_u y y_v u p mu mueff SP Su F_u F_v d_u relax_u u_old rho Istart Iend ...
-    Jstart Jend b aE aW aN aS aP yplus uplus k dudx dvdx
+global x x_u y y_v u p mueff SP Su F_u F_v d_u relax_u u_old rho Istart Iend ...
+    Jstart Jend b aE aW aN aS aP k dudx dvdx
 
 Istart = 3;
 Iend = NPI+1;

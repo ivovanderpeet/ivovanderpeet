@@ -3,10 +3,10 @@ function [] = kcoeff()
 
 % constants
 global NPI NPJ JBOT JMID JTOP LARGE
-global Dt sigmak Cmu
+global Dt
 % variables
-global x x_u y y_v SP Su F_u F_v mut rho u uplus tw Istart Iend ...
-    Jstart Jend b aE aW aN aS aP k k_old omega E2 betastar delta gamma_k
+global x x_u y y_v SP Su F_u F_v mut rho Istart Iend ...
+    Jstart Jend b aE aW aN aS aP k_old omega E2 betastar delta gamma_k k
 
 Istart = 2;
 Iend = NPI+1;
@@ -15,7 +15,6 @@ Jend = NPJ+1;
 
 convect();
 viscosity();
-calculateuplus();
 
 for I = Istart:Iend
     i = I;
@@ -48,14 +47,10 @@ for I = Istart:Iend
         
         % The source terms
         SP(I,J) = -betastar*rho(I,J)*omega(I,J);
-        Su(I,J) = 2.0*mut(I,J)*E2(I,J);%-2/3*rho(I,J)*k(I,J)*delta(I,J);
+        Su(I,J) = 2.0*mut(I,J)*E2(I,J)-2/3*rho(I,J)*k(I,J)*delta(I,J);
         
         Su(I,J) =  Su(I,J)*AREAw*AREAs;
         SP(I,J) =  SP(I,J)*AREAw*AREAs;
-        
-        if max(J == JMID)
-            SP(I,J) = -LARGE;
-        end
 
         % The coefficients (hybrid differencing scheme)
         aW(I,J) = max([ Fw, Dw + Fw/2, 0.]);

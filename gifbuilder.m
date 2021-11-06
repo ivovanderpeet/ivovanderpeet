@@ -1,7 +1,7 @@
 h = figure;
 axis tight manual % this ensures that getframe() returns a consistent size
 filename = 'testAnimated.gif';
-for time = Dt:10*Dt:TOTAL_TIME
+for time = Dt:Dt:TOTAL_TIME
 
     T_plot = TMID(:,round(time/Dt));
     plot(x',T_plot); title(sprintf("Time = %3.3f s", time));

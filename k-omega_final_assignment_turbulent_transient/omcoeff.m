@@ -46,7 +46,7 @@ for I = Istart:Iend
             gamma_om(I,J+1)*(y_v(j+1)-y(J)))*AREAn;
 
         SP(I,J) = -beta1*rho(I,J)*omega(I,J);
-        Su(I,J) = gamma1*(2.0*rho(I,J)*E2(I,J)-2/3*rho(I,J)*omega(I,J)*delta(I,J));
+        Su(I,J) = gamma1*(2.0*rho(I,J)*E2(I,J) - 2/3*rho(I,J)*omega(I,J)*delta(I,J));
         
         Su(I,J) =  Su(I,J)*AREAw*AREAs;
         SP(I,J) =  SP(I,J)*AREAw*AREAs;

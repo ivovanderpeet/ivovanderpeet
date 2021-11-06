@@ -54,12 +54,6 @@ for I = Istart:Iend
         aN(I,j) = max([-Fn, Dn - Fn/2, 0.]);
         aPold   = rho(I,J)*AREAe*AREAn/Dt;
         
-%         if I > ceil(11*(NPI+1)/200) && I < ceil(18*(NPI+1)/200) && ...
-%                 J > ceil(2*(NPJ+1)/5) && J < ceil(3*(NPJ+1)/5)
-%             SP(I,J) = -LARGE;
-%             Su(I,J) = LARGE*373.;
-%         end
-        
         % eq. 8.31 without time dependent terms (see also eq. 5.14):
         aP(I,J) = aW(I,J) + aE(I,J) + aS(I,J) + aN(I,J) + Fe - Fw + Fn - Fs - SP(I,J) + aPold;
         

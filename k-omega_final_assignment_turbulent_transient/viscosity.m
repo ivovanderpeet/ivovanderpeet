@@ -11,7 +11,7 @@ for I = 1:NPI+1
         mut(I,J)   = rho(I,J)*k(I,J)/(omega(I,J)+SMALL);
         mueff(I,J) = mu(I,J) + mut(I,J);
         gamma_om(I,J) = mut(I,J)/sigmaom + mu(I,J);
-        gamma_k(I,J) = mut(I,J)/sigmak + mu(I,J);
+        gamma_k(I,J)  = mut(I,J)/sigmak + mu(I,J);
     end
 end
 end

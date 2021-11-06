@@ -20,7 +20,6 @@ for I = 2:NPI+1
         
         if (j ~= 2)
             v(I,j) = v(I,j) + d_v(I,j)*(pc(I,J-1) - pc(I,J)); % eq. 6.25
-            
         end
     end
 end
