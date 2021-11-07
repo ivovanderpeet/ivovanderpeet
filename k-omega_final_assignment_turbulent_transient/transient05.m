@@ -81,7 +81,7 @@ C_mu = 0.04527;
 D_mu = -3.376*10^(-5);
 
 Dt         = 0.05;
-TOTAL_TIME = 10;
+TOTAL_TIME = 5;
 
 %% start main function here
 init(); % initialization
@@ -93,6 +93,11 @@ TMID = zeros(length(x),round(TOTAL_TIME/Dt));
 for time = Dt:Dt:TOTAL_TIME
     waitbar(time/TOTAL_TIME,f,'Even geduld pik');
     iter = 0;
+
+    if time == TOTAL_TIME
+        SAVGneeded = 1e-7;
+        SMAXneeded = 1e-6;
+    end
 
     % outer iteration loop
     while iter < MAX_ITER && SMAX > SMAXneeded && SAVG > SAVGneeded
