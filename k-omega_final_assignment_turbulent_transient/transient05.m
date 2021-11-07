@@ -14,7 +14,7 @@ close all
 clc
 %% declare all variables and contants
 % variables
-global u v d_u d_v pc p T rho mu Gamma Cp
+global u v d_u d_v pc p T rho mu Gamma Cp kinematic_mu
 global b aP aE aW aN aS omega k
 global u_old v_old pc_old T_old omega_old k_old 
 global uplus yplus yplus1 yplus2  
@@ -23,14 +23,15 @@ global x x_u y y_v NPI NPJ XMAX YMAX JBOT JMID JTOP HBOT HMID HTOP Dy
 global SMAX SAVG LARGE SMALL BIG
 global sigmak sigmaom gamma1 beta1 betastar ERough Ti Cmu kappa 
 global NPRINT COFLOW Dt U_IN
+global A_mu B_mu C_mu D_mu relax_rho
 
 %% Configuration parameters
 COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
 
 %% Constants
 % Domain
-NPI        = 300;       % number of grid cells in x-direction [-]
-NPJ        = 100;        % number of grid cells in y-direction [-]
+NPI        = 150;       % number of grid cells in x-direction [-] %300
+NPJ        = 80;        % number of grid cells in y-direction [-] %100
 XMAX       = 0.20;      % width of the domain [m]
 HBOT       = 0.01;
 HTOP       = 0.01;
@@ -60,7 +61,7 @@ BIG        = 1E10;
 
 % Input constants
 P_ATM      = 101000.;   % athmospheric pressure [Pa]
-U_IN       = 0.1;       % in flow velocity [m/s]
+U_IN   = 0.1;       % in flow velocity [m/s]
 
 % k-epsilon
 sigmak     = 2.;
@@ -73,8 +74,14 @@ Ti         = 0.04;
 Cmu        = 0.09;
 kappa      = 0.4187;
 
+% viscosity constants
+A_mu = 1.856*10^(-11);
+B_mu = 4209;
+C_mu = 0.04527;
+D_mu = -3.376*10^(-5);
+
 Dt         = 0.05;
-TOTAL_TIME = 50;
+TOTAL_TIME = 10;
 
 %% start main function here
 init(); % initialization
@@ -128,6 +135,11 @@ for time = Dt:Dt:TOTAL_TIME
         for iter_T = 1:T_ITER
             T = solve(T, b, aE, aW, aN, aS, aP);
         end
+        
+        rho(:,:) = (1 - relax_rho)*rho(:,:) + relax_rho*((999.83952+16.945176.*(T-273)-7.9870401*10^(-3)*(T-273).^2-46.170461*10^(-6)*(T-273).^3+105.56302*10^(-9)*(T-273).^4-280.54253*10^(-12)*(T-273).^5)./(1+16.897850*10^(-3)*(T-273)));
+        rho(:,JMID) = 8960;
+        mu(:,:) = A_mu*exp((B_mu./T)+C_mu.*T+D_mu.*T.^2)*10^(-3);
+        kinematic_mu(:,:) = mu./rho;
         
         viscosity();
         bound();
@@ -255,6 +267,33 @@ plot3(x, HBOT*ones(1,length(x)), max(max(omega_log))*ones(1,length(x)), 'r');
 
 figure(8)
 surf(X,Y,u'); colorbar; title("u")
+view(0,90)
+hold on
+
+figure(9)
+rho(:,JMID)=1000;
+surf(X,Y,rho'); colorbar; title("Density (rho_{MID} is 1000)")
+view(0,90); hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(rho))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(rho))*ones(1,length(x)), 'r');
+xlim([0,XMAX])
+
+figure(10)
+surf(X,Y,mu'); colorbar; title("Viscosity")
+view(0,90); hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(mu))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(mu))*ones(1,length(x)), 'r');
+xlim([0,XMAX])
+
+figure(11)
+surf(X,Y,kinematic_mu'); colorbar; title("Kinematic viscosity")
+view(0,90); hold on
+plot3(x, (HBOT+HMID)*ones(1,length(x)), max(max(kinematic_mu))*ones(1,length(x)), 'r');
+plot3(x, HBOT*ones(1,length(x)), max(max(kinematic_mu))*ones(1,length(x)), 'r');
+xlim([0,XMAX])
+
+figure(12)
+surf(X,Y,v'); colorbar; title("v")
 view(0,90)
 hold on
 

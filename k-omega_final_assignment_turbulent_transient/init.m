@@ -7,7 +7,8 @@ global NPI NPJ LARGE U_IN XMAX YMAX JBOT JMID JTOP COFLOW HBOT HMID HTOP Dy
 global x x_u y y_v u v pc p T rho mu mut mueff Gamma Cp k omega delta E E2 yplus yplus1 ...
     yplus2 uplus tw b SP Su d_u d_v SMAX SAVG relax_u relax_v ...
     relax_pc relax_T aP aE aW aN aS F_u F_v u_old v_old pc_old T_old k_old ...
-    omega_old dudx dudy dvdx dvdy gamma_k gamma_om
+    omega_old dudx dudy dvdx dvdy gamma_k gamma_om kinematic_mu ...
+    A_mu B_mu C_mu D_mu relax_rho
 
 % begin: memalloc()========================================================
 % allocate memory for variables
@@ -23,6 +24,7 @@ p   = zeros(NPI+2,NPJ+2);
 T   = zeros(NPI+2,NPJ+2);
 rho = zeros(NPI+2,NPJ+2);
 mu  = zeros(NPI+2,NPJ+2);
+kinematic_mu = zeros(NPI+2,NPJ+2);
 mut  = zeros(NPI+2,NPJ+2);
 mueff  = zeros(NPI+2,NPJ+2);
 Gamma = zeros(NPI+2,NPJ+2);
@@ -121,12 +123,14 @@ end
 
 v(:,:)     = 0.;       % Velocity in y-direction
 p(:,:)     = 0.;       % Relative pressure
-T(:,:)     = 273+10.;     % Temperature
+T(:,:)     = 273+50.;     % Temperature
 T(:,JMID)  = 273+50.;
-T(:,JTOP)  = 273+90.;
-rho(:,:) = 1000;
-rho(:,JMID) = 9e3;
-mu(:,:) = 1e-3;
+T(:,JTOP)  = 273+50.;
+rho(:,:) = (999.83952+16.945176.*(T-273)-7.9870401*10^(-3)*(T-273).^2-46.170461*10^(-6)*(T-273).^3+105.56302*10^(-9)*(T-273).^4-280.54253*10^(-12)*(T-273).^5)./(1+16.897850*10^(-3)*(T-273));
+rho(:,JMID) = 8960;
+mu(:,:) = A_mu*exp((B_mu./T)+C_mu.*T+D_mu.*T.^2)*10^(-3);
+kinematic_mu(:,:) = mu./rho;
+
 Cp(:,:) = 4200;
 Cp(:,JMID) = 385;
 Gamma = 0.598./Cp;
@@ -146,6 +150,7 @@ relax_u   = 0.8;            % See eq. 6.36
 relax_v   = relax_u;        % See eq. 6.37
 relax_pc  = 1.1 - relax_u;  % See eq. 6.33
 relax_T   = 1.0;            % Relaxation factor for temperature
+relax_rho = 0.1;
 % end of initilization=====================================================
 end
 

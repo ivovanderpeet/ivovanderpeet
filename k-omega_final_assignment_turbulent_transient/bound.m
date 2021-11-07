@@ -14,18 +14,18 @@ global k omega
 % Velocity, temperature, k, omega
 if COFLOW == -1
     u(NPI+1,JBOT) = COFLOW*U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
-    T(NPI+2,JBOT) = 273+10;
+    T(NPI+2,JBOT) = 273+50;
     k(NPI+2,JBOT) = 1.5*(U_IN*Ti)^2;
     omega(NPI+2,JBOT) = k(NPI+2,JBOT).^0.5/(0.07*HBOT*0.5);
 elseif COFLOW == 1
     u(2,JBOT) = U_IN*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
-    T(1,JBOT) = 273+10;
+    T(1,JBOT) = 273+50;
     k(1,JBOT) = 1.5*(U_IN*Ti)^2;
     omega(1,JBOT) = k(1,JBOT).^0.5/(0.07*HBOT*0.5); % at inlet https://www.cfd-online.com/Wiki/Turbulence_free-stream_boundary_conditions
 end
 
 u(2,JTOP) = U_IN*(1.-(2.*((y(JTOP) - (HBOT+HMID))-HTOP/2.)/HTOP).^2);
-T(1,JTOP) = 273+90;
+T(1,JTOP) = 273+50;
 k(1,JTOP)     = 1.5*(U_IN*Ti)^2;
 omega(1,JTOP)   = k(1,JTOP).^0.5/(0.07*HTOP*0.5); % at inlet
 
