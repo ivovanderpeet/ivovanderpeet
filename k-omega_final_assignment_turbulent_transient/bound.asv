@@ -24,7 +24,7 @@ elseif COFLOW == 1
     u(2,JBOT) = U_IN_bot*(1.-(2.*(y(JBOT)-HBOT/2.)/HBOT).^2);
     T(1,JBOT) = 273+10;
 %     k(1,JBOT) = 1.5*(U_IN*Ti)^2;
-    k(1,JBOT) = 1.5*(U_IN_bot*Ti)^2;
+
     omega(1,JBOT) = k(1,JBOT).^0.5/(0.07*HBOT*0.5); % at inlet https://www.cfd-online.com/Wiki/Turbulence_free-stream_boundary_conditions
 end
 
@@ -32,7 +32,6 @@ end
 u(2,JTOP) = U_IN_bot*rho_ratio*(1.-(2.*((y(JTOP) - (HBOT+HMID))-HTOP/2.)/HTOP).^2);
 T(1,JTOP) = 273+90;
 % k(1,JTOP)     = 1.5*(U_IN*Ti)^2;
-k(1,JTOP)     = 1.5*(U_IN_bot*rho_ratio*Ti)^2;
 omega(1,JTOP)   = k(1,JTOP).^0.5/(0.07*HTOP*0.5); % at inlet
 
 % Set omega to BIG at wall element

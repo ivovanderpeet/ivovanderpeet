@@ -22,7 +22,7 @@ global uplus yplus yplus1 yplus2
 global x x_u y y_v NPI NPJ XMAX YMAX JBOT JMID JTOP HBOT HMID HTOP Dy
 global SMAX SAVG LARGE SMALL BIG
 global sigmak sigmaom gamma1 beta1 betastar ERough Ti Cmu kappa 
-global NPRINT COFLOW Dt U_IN
+global NPRINT COFLOW Dt U_IN_bot
 global A_mu B_mu C_mu D_mu relax_rho
 
 %% Configuration parameters
@@ -61,7 +61,8 @@ BIG        = 1E10;
 
 % Input constants
 P_ATM      = 101000.;   % athmospheric pressure [Pa]
-U_IN   = 0.1;       % in flow velocity [m/s]
+% U_IN       = 0.1;       % in flow velocity [m/s]
+U_IN_bot       = 0.1;       % in flow velocity [m/s]
 
 % k-epsilon
 sigmak     = 2.;

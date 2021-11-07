@@ -54,13 +54,13 @@ for I = Istart:Iend
         aN(I,j) = max([-Fn, Dn - Fn/2, 0.]);
         aPold   = rho(I,J)*AREAe*AREAn/Dt;
 
-        % transport of T through the baffles can be switched off by setting the coefficients to zero  
-        if (I == ceil((NPI+1)/3)-1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % left of baffle #1
-            aE(I,J) = 0;
-        end       
-        if (I == ceil((NPI+1)/3)   && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % right of baffle #1
-            aW(I,J) = 0;
-        end
+%         % transport of T through the baffles can be switched off by setting the coefficients to zero  
+%         if (I == ceil((NPI+1)/3)-1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % left of baffle #1
+%             aE(I,J) = 0;
+%         end       
+%         if (I == ceil((NPI+1)/3)   && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % right of baffle #1
+%             aW(I,J) = 0;
+%         end
         
         % eq. 8.31 without time dependent terms (see also eq. 5.14):
         aP(I,J) = aW(I,J) + aE(I,J) + aS(I,J) + aN(I,J) + Fe - Fw + Fn - Fs - SP(I,J) + aPold;
