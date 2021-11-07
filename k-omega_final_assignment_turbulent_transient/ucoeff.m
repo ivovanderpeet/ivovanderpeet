@@ -51,6 +51,10 @@ for I = Istart:Iend
         if max(J == JMID)
             SP(i,J) = -LARGE;
         end
+
+        if (i == ceil((NPI+1)/2) && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2)) % baffle #1
+            SP(i,J) = -LARGE;
+        end
         
         % The coefficients (hybrid differencing scheme)
         aW(i,J) = max([ Fw, Dw + Fw/2, 0.]);

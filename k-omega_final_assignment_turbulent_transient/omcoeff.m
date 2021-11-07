@@ -63,7 +63,11 @@ for I = Istart:Iend
         elseif isequal(J,max(JBOT)) || isequal(J,min(JTOP))
             SP(I,J) = -LARGE;
             Su(I,J) = LARGE*6*kinematic_mu(I,J)/(beta1*Dy^2); % Kinematic viscosity v = 1e-6 (at 20C)
+        end
 
+        if (I == ceil((NPI+1)/2) && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2)) % baffle #1
+            SP(I,J) = -LARGE;
+            Su(I,J) = LARGE*BIG;
         end
 
         % The coefficients (hybrid differencing scheme)

@@ -2,7 +2,7 @@ function [] = vcoeff()
 % Purpose: To calculate the coefficients for the v equation.
 
 % constants
-global NPI NPJ JMID LARGE Dt
+global NPI NPJ JMID LARGE Dt JBOT JMID JTOP
 % variables
 global x x_u y y_v v p mueff SP Su F_u F_v d_v relax_v v_old rho Istart Iend ...
     Jstart Jend b aE aW aN aS aP dvdy dudy k
@@ -58,6 +58,14 @@ for I = Istart:Iend
         aS(I,j) = max([ Fs, Ds + Fs/2, 0.]);
         aN(I,j) = max([-Fn, Dn - Fn/2, 0.]);
         aPold   = 0.5*(rho(I,J-1) + rho(I,J))*AREAe*AREAn/Dt;
+
+        % transport of v through the baffles can be switched off by setting the coefficients to zero
+        if (I == ceil((NPI+1)/2)-1 && j > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % left of baffle #1
+            aE(I,j) = 0;
+        end
+        if (I == ceil((NPI+1)/2) && j > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % right of baffle #1
+            aW(I,j) = 0;
+        end
         
         % eq. 8.31 without time dependent terms (see also eq. 5.14):
         aP(I,j) = aW(I,j) + aE(I,j) + aS(I,j) + aN(I,j) + Fe - Fw + Fn - Fs - SP(I,J) + aPold;
