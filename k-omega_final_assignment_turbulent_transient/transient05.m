@@ -29,12 +29,12 @@ COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
 
 %% Constants
 % Domain
-NPI        = 100;       % number of grid cells in x-direction [-]
+NPI        = 300;       % number of grid cells in x-direction [-]
 NPJ        = 100;        % number of grid cells in y-direction [-]
 XMAX       = 0.20;      % width of the domain [m]
-HBOT       = 0.1;
-HTOP       = 0.1;
-HMID       = 0.02;
+HBOT       = 0.01;
+HTOP       = 0.01;
+HMID       = 0.002;
 YMAX       = HBOT + HMID + HTOP;  % height of the domain [m]
 
 JBOT = 2:ceil((NPJ+1)/YMAX*HBOT);

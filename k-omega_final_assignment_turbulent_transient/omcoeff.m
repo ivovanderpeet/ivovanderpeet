@@ -3,7 +3,7 @@ function [] = omcoeff()
 
 % constants
 global NPI NPJ JBOT JMID JTOP LARGE SMALL BIG
-global Dt gamma1 beta1
+global Dt gamma1 beta1 Dy
 % variables
 global x x_u y y_v SP Su F_u F_v rho Istart Iend ...
     Jstart Jend b aE aW aN aS aP omega E2 omega_old delta gamma_om
@@ -54,6 +54,16 @@ for I = Istart:Iend
         if max(J == JMID)
             SP(I,J) = -LARGE;
             Su(I,J) = LARGE*BIG;
+        end
+
+        if J == 2 || J == NPJ+1
+            SP(I,J) = -LARGE;
+            Su(I,J) = LARGE*6*1e-6/(beta1*(Dy/2)^2); % Kinematic viscosity v = 1e-6 (at 20C)
+
+        elseif isequal(J,max(JBOT)) || isequal(J,min(JTOP))
+            SP(I,J) = -LARGE;
+            Su(I,J) = LARGE*6*1e-6/(beta1*Dy^2); % Kinematic viscosity v = 1e-6 (at 20C)
+
         end
 
         % The coefficients (hybrid differencing scheme)
