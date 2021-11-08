@@ -6,7 +6,7 @@ ylabel('Temperature [K]');
 title('Transient behavior of mean wall temperature')
 
 NPLOT = 4;
-tPLOT = [10 20 30 40 50];
+tPLOT = [1 2 3 4 5];
 
 
 for i = 1:length(TMID(1,:))

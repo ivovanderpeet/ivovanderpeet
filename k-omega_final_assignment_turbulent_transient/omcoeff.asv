@@ -2,7 +2,7 @@ function [] = omcoeff()
 % Purpose: To calculate the coefficients for the epsilon.
 
 % constants
-global NPI NPJ JBOT JMID JTOP LARGE SMALL BIG nBAFFLE iBAFFLE hBAFFLE sideBAFFLE
+global NPI NPJ JBOT JMID JTOP LARGE SMALL BIG
 global Dt gamma1 beta1 Dy kinematic_mu
 % variables
 global x x_u y y_v SP Su F_u F_v rho Istart Iend ...
@@ -65,17 +65,10 @@ for I = Istart:Iend
             Su(I,J) = LARGE*6*kinematic_mu(I,J)/(beta1*Dy^2); % Kinematic viscosity v = 1e-6 (at 20C)
         end
 
-        % BAFFLES
-        for ii = 1:nBAFFLE
-            if i == iBAFFLE(ii) 
-                if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
-                    SP(I,J) = -LARGE;
-                    Su(I,J) = LARGE*BIG;
-                elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
-                    SP(I,J) = -LARGE;
-                    Su(I,J) = LARGE*BIG;
-                end
-            end
+        iBAFFLE = ceil(15/50*NPI+1);
+        if (I == ceil(20/(NPI+1)/2) && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2)) % baffle #1
+            SP(I,J) = -LARGE;
+            Su(I,J) = LARGE*BIG;
         end
 
         % The coefficients (hybrid differencing scheme)

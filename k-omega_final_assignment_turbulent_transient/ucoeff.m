@@ -2,7 +2,8 @@ function [] = ucoeff()
 % Purpose: To calculate the coefficients for the u equation.
 
 % constants
-global NPI NPJ JBOT JMID JTOP LARGE Dt Cmu
+global NPI NPJ JBOT JMID JTOP LARGE Dt Cmu 
+global nBAFFLE iBAFFLE hBAFFLE sideBAFFLE
 % variables
 global x x_u y y_v u p mueff SP Su F_u F_v d_u relax_u u_old rho Istart Iend ...
     Jstart Jend b aE aW aN aS aP k dudx dvdx
@@ -52,9 +53,16 @@ for I = Istart:Iend
             SP(i,J) = -LARGE;
         end
 
-%         if (i == ceil((NPI+1)/2) && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2)) % baffle #1
-%             SP(i,J) = -LARGE;
-%         end
+        % BAFFLES
+        for ii = 1:nBAFFLE
+            if i == iBAFFLE(ii) 
+                if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    SP(i,J) = -LARGE;
+                elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    SP(i,J) = -LARGE;
+                end
+            end
+        end
         
         % The coefficients (hybrid differencing scheme)
         aW(i,J) = max([ Fw, Dw + Fw/2, 0.]);

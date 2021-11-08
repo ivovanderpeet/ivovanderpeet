@@ -2,7 +2,7 @@ function [] = Tcoeff()
 % Purpose: To calculate the coefficients for the T equation.
 
 % constants
-global NPI NPJ LARGE Dt JBOT JMID JTOP
+global NPI NPJ LARGE Dt JBOT JMID JTOP nBAFFLE iBAFFLE hBAFFLE sideBAFFLE
 % variables
 global x x_u y y_v T Gamma SP Su F_u F_v relax_T T_old rho Istart Iend ...
     Jstart Jend b aE aW aN aS aP 
@@ -54,13 +54,23 @@ for I = Istart:Iend
         aN(I,j) = max([-Fn, Dn - Fn/2, 0.]);
         aPold   = rho(I,J)*AREAe*AREAn/Dt;
 
-%         % transport of T through the baffles can be switched off by setting the coefficients to zero  
-%         if (I == ceil((NPI+1)/3)-1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % left of baffle #1
-%             aE(I,J) = 0;
-%         end       
-%         if (I == ceil((NPI+1)/3)   && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))     % right of baffle #1
-%             aW(I,J) = 0;
-%         end
+        % transport of T through the baffles can be switched off by setting the coefficients to zero  
+        for ii = 1:nBAFFLE
+            if I == iBAFFLE(ii)-1
+                if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    aE(I,J) = 0;
+                elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    aE(I,J) = 0;
+                end
+            end
+            if I == iBAFFLE(ii)
+                if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    aW(I,J) = 0;
+                elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    aW(I,J) = 0;
+                end
+            end
+        end
         
         % eq. 8.31 without time dependent terms (see also eq. 5.14):
         aP(I,J) = aW(I,J) + aE(I,J) + aS(I,J) + aN(I,J) + Fe - Fw + Fn - Fs - SP(I,J) + aPold;

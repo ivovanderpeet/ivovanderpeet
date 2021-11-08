@@ -144,7 +144,7 @@ Gamma(:,JMID) = 400./Cp(:,JMID);
 k(:,:)     = 1e-3;     % k
 omega(:,:) = 1e-4;     % omega
 
-rho_ratio = (rho(2,JBOT)/length(JBOT))/(rho(2,JTOP)/length(JTOP));
+rho_ratio = rho(2,2)/rho(2,NPJ+1);
 for J = 1:NPJ+2
     if max(J == JBOT)
         u(:,J) = COFLOW*U_IN_bot*(1.-(2.*(y(J)-HBOT/2.)/HBOT)^2); % inlet bot
