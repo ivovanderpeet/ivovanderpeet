@@ -104,6 +104,7 @@ Q_out_bot = zeros(1,round(TOTAL_TIME/Dt));
 
 U_TIME = zeros([size(u), TOTAL_TIME/Dt]);
 V_TIME = zeros([size(v), TOTAL_TIME/Dt]);
+T_TIME = zeros([size(t), TOTAL_TIME/Dt]);
 
 for time = Dt:Dt:TOTAL_TIME
     waitbar(time/TOTAL_TIME,f,'Even geduld pik');
@@ -227,6 +228,7 @@ for time = Dt:Dt:TOTAL_TIME
 
     U_TIME(:,:,round(time/Dt)) = u(:,:);
     V_TIME(:,:,round(time/Dt)) = v(:,:);
+    T_TIME(:,:,round(time/Dt)) = T(:,:);
 
 end % end of calculation
 
