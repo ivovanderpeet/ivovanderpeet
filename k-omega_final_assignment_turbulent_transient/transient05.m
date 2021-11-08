@@ -26,7 +26,7 @@ global A_mu B_mu C_mu D_mu relax_rho
 global iBAFFLE nBAFFLE hBAFFLE sideBAFFLE
 
 %% Configuration parameters
-COFLOW = -1; % set to -1 for counterflow, or 1 for coflow
+COFLOW = 1; % set to -1 for counterflow, or 1 for coflow
 
 %% Constants
 % Domain
@@ -42,7 +42,7 @@ JBOT = 2:ceil((NPJ+1)/YMAX*HBOT);
 JMID = ceil((NPJ+1)/YMAX*HBOT)+1:ceil((NPJ+1)/YMAX*(HBOT+HMID));
 JTOP = ceil((NPJ+1)/YMAX*(HBOT+HMID))+1:NPJ+1;
 
-nBAFFLE = 5;
+nBAFFLE = 3;
 % hBAFFLE = 2/3;
 iBAFFLE = zeros(nBAFFLE,1);
 sideBAFFLE = zeros(nBAFFLE,1);
@@ -89,7 +89,7 @@ C_mu = 0.04527;
 D_mu = -3.376*10^(-5);
 
 Dt         = 0.01;  % Bij 0 baffles kan deze op 0.05
-TOTAL_TIME = 5;
+TOTAL_TIME = 50;
 
 %% start main function here
 init(); % initialization
@@ -104,7 +104,7 @@ Q_out_bot = zeros(1,round(TOTAL_TIME/Dt));
 
 U_TIME = zeros([size(u), TOTAL_TIME/Dt]);
 V_TIME = zeros([size(v), TOTAL_TIME/Dt]);
-T_TIME = zeros([size(t), TOTAL_TIME/Dt]);
+T_TIME = zeros([size(T), TOTAL_TIME/Dt]);
 
 for time = Dt:Dt:TOTAL_TIME
     waitbar(time/TOTAL_TIME,f,'Even geduld pik');
