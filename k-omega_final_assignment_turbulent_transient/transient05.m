@@ -17,11 +17,10 @@ clc
 global u v d_u d_v pc p T rho mu Gamma Cp kinematic_mu
 global b aP aE aW aN aS omega k
 global u_old v_old pc_old T_old omega_old k_old
-global uplus yplus yplus1 yplus2
 % constants
 global x x_u y y_v NPI NPJ XMAX YMAX JBOT JMID JTOP HBOT HMID HTOP Dy
 global SMAX SAVG LARGE SMALL BIG
-global sigmak sigmaom gamma1 beta1 betastar ERough Ti Cmu kappa
+global sigmak sigmaom gamma1 beta1 betastar Ti Cmu kappa
 global NPRINT COFLOW Dt U_IN_bot
 global A_mu B_mu C_mu D_mu relax_rho
 global iBAFFLE nBAFFLE hBAFFLE sideBAFFLE
@@ -79,7 +78,6 @@ sigmaom    = 2.;
 gamma1     = 0.553;
 beta1      = 0.075;
 betastar   = 0.09;
-% ERough     = 9.793;
 Ti         = 0.04;
 Cmu        = 0.09;
 kappa      = 0.4187;
@@ -104,6 +102,8 @@ Q_out_top = zeros(1,round(TOTAL_TIME/Dt));
 Q_in_bot = zeros(1,round(TOTAL_TIME/Dt));
 Q_out_bot = zeros(1,round(TOTAL_TIME/Dt));
 
+U_TIME = zeros([size(u), TOTAL_TIME/Dt]);
+V_TIME = zeros([size(v), TOTAL_TIME/Dt]);
 
 for time = Dt:Dt:TOTAL_TIME
     waitbar(time/TOTAL_TIME,f,'Even geduld pik');
@@ -225,7 +225,8 @@ for time = Dt:Dt:TOTAL_TIME
     Q_in_top(round(time/Dt)) = sum(m_in_top.*Cp(2,JTOP).*T(2,JTOP));
     Q_out_top(round(time/Dt)) = sum(m_out_top.*Cp(NPI+1,JTOP).*T(NPI+1,JTOP));
 
-    
+    U_TIME(:,:,round(time/Dt)) = u(:,:);
+    V_TIME(:,:,round(time/Dt)) = v(:,:);
 
 end % end of calculation
 
