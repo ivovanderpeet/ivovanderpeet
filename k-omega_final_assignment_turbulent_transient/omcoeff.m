@@ -68,11 +68,20 @@ for I = Istart:Iend
         % BAFFLES
         for ii = 1:nBAFFLE
             if i == iBAFFLE(ii) 
+                % Top BAFFLES
                 if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
-                    SP(I,J) = -LARGE;
+                    SP(i,J) = -LARGE;
                     Su(I,J) = LARGE*BIG;
                 elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
-                    SP(I,J) = -LARGE;
+                    SP(i,J) = -LARGE;
+                    Su(I,J) = LARGE*BIG;
+                end
+                % Bot BAFFLES
+                if (sideBAFFLE(ii) == 1 && J < ceil(max(JBOT)/2))
+                    SP(i,J) = -LARGE;
+                    Su(I,J) = LARGE*BIG;
+                elseif (sideBAFFLE(ii) == 0 && J > ceil(max(JBOT)/2) && J <= max(JBOT))
+                    SP(i,J) = -LARGE;
                     Su(I,J) = LARGE*BIG;
                 end
             end

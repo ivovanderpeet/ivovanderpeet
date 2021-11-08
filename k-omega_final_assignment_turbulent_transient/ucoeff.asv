@@ -65,7 +65,7 @@ for I = Istart:Iend
                 % Bot BAFFLES
                 if (sideBAFFLE(ii) == 1 && J < ceil(max(JBOT)/2))
                     SP(i,J) = -LARGE;
-                elseif (sideBAFFLE(ii) == 0 && J > ceil(max(JBOT)/2) && J <= max(JBOT))
+                elseif (sideBAFFLE(ii) == 0 && J > ceil(max(JBOT)/2) && J < max(JBOT))
                     SP(i,J) = -LARGE;
                 end
             end

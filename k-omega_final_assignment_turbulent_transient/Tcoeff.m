@@ -57,16 +57,32 @@ for I = Istart:Iend
         % transport of T through the baffles can be switched off by setting the coefficients to zero  
         for ii = 1:nBAFFLE
             if I == iBAFFLE(ii)-1
+                % TOP Baffles
                 if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
                     aE(I,J) = 0;
                 elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
                     aE(I,J) = 0;
                 end
+
+                % BOT Baffles
+                if (sideBAFFLE(ii) == 1 && J < ceil(max(JBOT)/2))
+                    aE(I,J) = 0;
+                elseif (sideBAFFLE(ii) == 0 && J > ceil(max(JBOT)/2) && J <= max(JBOT))
+                    aE(I,J) = 0;
+                end
             end
             if I == iBAFFLE(ii)
+                % TOP BAFFLES
                 if (sideBAFFLE(ii) == 1 && J > ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
                     aW(I,J) = 0;
                 elseif (sideBAFFLE(ii) == 0 && J > max(JMID) && J < ceil(max(JMID)+(max(JTOP)-max(JMID))/2))
+                    aW(I,J) = 0;
+                end
+
+                % BOT Baffles
+                if (sideBAFFLE(ii) == 1 && J < ceil(max(JBOT)/2))
+                    aW(I,J) = 0;
+                elseif (sideBAFFLE(ii) == 0 && J > ceil(max(JBOT)/2) && J <= max(JBOT))
                     aW(I,J) = 0;
                 end
             end
